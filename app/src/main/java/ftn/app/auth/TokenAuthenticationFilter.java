@@ -17,9 +17,9 @@ import java.io.IOException;
 
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
-	private TokenUtils tokenUtils;
+	private final TokenUtils tokenUtils;
 
-	private UserDetailsService userDetailsService;
+	private final UserDetailsService userDetailsService;
 	
 	protected final Log LOGGER = LogFactory.getLog(getClass());
 
@@ -32,18 +32,12 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 	public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 
-
 		String username;
-
 		String authToken = tokenUtils.getToken(request);
-		
 		try {
-	
 			if (authToken != null) {
 				username = tokenUtils.getUsernameFromToken(authToken);
-				
 				if (username != null) {
-
 					UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 					if (tokenUtils.validateToken(authToken, userDetails)) {
 						TokenBasedAuthentication authentication = new TokenBasedAuthentication(userDetails);
@@ -52,11 +46,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 					}
 				}
 			}
-			
 		} catch (ExpiredJwtException ex) {
 			LOGGER.debug("Token expired!");
 		}
 		chain.doFilter(request, response);
 	}
-
 }

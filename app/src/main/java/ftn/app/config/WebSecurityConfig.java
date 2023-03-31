@@ -50,8 +50,7 @@ public class WebSecurityConfig {
  	    return authProvider;
  	}
  
- 	
-    // Registrujemo authentication manager koji ce da uradi autentifikaciju korisnika za nas
+
  	@Bean
  	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
  	    return authConfig.getAuthenticationManager();
