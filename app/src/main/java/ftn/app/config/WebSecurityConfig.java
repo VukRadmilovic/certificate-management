@@ -61,7 +61,7 @@ public class WebSecurityConfig {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint);
     	http.authorizeRequests()
-					.antMatchers("/api/user/login").permitAll()
+					.antMatchers("/api/user/login","/api/user/test").permitAll()
 				.anyRequest().authenticated().and()
 				.cors().and()
 				.addFilterBefore(new TokenAuthenticationFilter(tokenUtils,  userService), BasicAuthenticationFilter.class);

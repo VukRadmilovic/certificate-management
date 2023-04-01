@@ -31,6 +31,7 @@ public class Main {
         bean.setValidationMessageSource(messageSource());
         return bean;
     }
+
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
     }
