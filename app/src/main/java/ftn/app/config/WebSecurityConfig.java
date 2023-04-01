@@ -46,7 +46,6 @@ public class WebSecurityConfig {
  	    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
  	    authProvider.setUserDetailsService(userService);
  	    authProvider.setPasswordEncoder(passwordEncoder());
- 	 
  	    return authProvider;
  	}
  
@@ -61,7 +60,7 @@ public class WebSecurityConfig {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint);
     	http.authorizeRequests()
-					.antMatchers("/api/user/login","/api/user/test").permitAll()
+					.antMatchers("/api/user/login").permitAll()
 				.anyRequest().authenticated().and()
 				.cors().and()
 				.addFilterBefore(new TokenAuthenticationFilter(tokenUtils,  userService), BasicAuthenticationFilter.class);

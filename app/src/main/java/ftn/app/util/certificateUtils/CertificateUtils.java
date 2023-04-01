@@ -1,4 +1,4 @@
-package ftn.app.certificateUtils;
+package ftn.app.util.certificateUtils;
 
 import ftn.app.model.IssuerData;
 import ftn.app.model.SubjectData;
@@ -18,6 +18,12 @@ import java.security.cert.X509Certificate;
 @Component
 public class CertificateUtils {
 
+    /**
+     * Generise sertifikat koji se moze cuvati u keystore-u
+     * @param subjectData - informacije o samom sertifikatu
+     * @param issuerData - informacije o izdavacu sertifikata
+     * @return izgenerisan sertifikat
+     */
     public X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData) {
         try {
             JcaContentSignerBuilder builder = new JcaContentSignerBuilder("SHA256WithRSAEncryption");

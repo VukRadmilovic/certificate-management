@@ -1,4 +1,4 @@
-package ftn.app.keystoreUtils;
+package ftn.app.util;
 
 import org.springframework.stereotype.Component;
 
@@ -23,6 +23,10 @@ public class KeystoreUtils {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Omogucava koriscenje postojeceg keystore-a
+     */
     private void loadKeystore() {
         try {
             keyStore.load(new FileInputStream(KEYSTORE_PATH), KEYSTORE_PASSWORD);
@@ -31,6 +35,12 @@ public class KeystoreUtils {
         }
     }
 
+    /*NE POZIVATI UKOLIKO POSTOJI KREIRAN KEYSTORE.JKS*/
+
+    /**
+     * Klasa koja pravi novi keystore.
+     * NE POZIVATI UKOLIKO POSTOJI VEC KREIRAN KEYSTORE.JKS U KEYSTORES FOLDERU!
+     */
     public void saveKeystore() {
         try {
             keyStore.load(null, KEYSTORE_PASSWORD);
@@ -41,6 +51,13 @@ public class KeystoreUtils {
         }
     }
 
+    /**
+     * Cuva sertifikat i privatni kljuc koji se generise za njega
+     * @param alias - jedinstvena oznaka za sertifikat/privatni kljuc koji se cuva u keystore-u
+     * @param privateKey - privatni kljuc koji odgovara sertifikatu i cuva se pod alijasom aliasKey
+     * @param password - sifra pod kojom se cuva privatni kljuc
+     * @param certificate - izgenerisan sertifikat koji se cuva pod alijasom aliasCert
+     */
     public void saveCertificate(String alias, PrivateKey privateKey, char[] password, Certificate certificate) {
         try {
             loadKeystore();
@@ -51,7 +68,12 @@ public class KeystoreUtils {
         }
     }
 
-    public Certificate readCertificate(String alias) throws KeyStoreException {
+    /**
+     * Cita sertifikat iz keystore-a
+     * @param alias - alias pod kojim se cuva bez Cert sufiksa
+     * @return sertifikat pod zadatim alijasom
+     */
+    public Certificate readCertificate(String alias) {
         try {
             alias = alias + "Cert";
             if (keyStore.isCertificateEntry(alias)) {
@@ -64,6 +86,12 @@ public class KeystoreUtils {
     }
 
 
+    /**
+     * Cita privatni kljuc koji se vezuje za odredjeni sertifikat
+     * @param alias - alias pod kojim se cuva kljuc bez sufiksa Key
+     * @param pass - lozinka pod kojom se cuva privatni kljuc (nije isto sto i lozinka za keystore!!)
+     * @return privatni kljuc pod zadatim alijasom i lozinkom
+     */
     public PrivateKey readPrivateKey(String alias, String pass) {
         try {
             alias = alias + "Key";

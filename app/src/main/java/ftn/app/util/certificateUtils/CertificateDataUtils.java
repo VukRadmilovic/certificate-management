@@ -1,4 +1,4 @@
-package ftn.app.certificateUtils;
+package ftn.app.util.certificateUtils;
 
 import ftn.app.model.IssuerData;
 import ftn.app.model.SubjectData;
@@ -14,6 +14,10 @@ import java.util.Date;
 @Component
 public class CertificateDataUtils {
 
+    /**
+     * Kreira informacije o samom sertifikatu koje se koriste za generisanje sertifikata
+     * @return SubjectData objekat sa odgovarajucim informacijama
+     */
     public SubjectData generateSubjectData() {
         try {
             KeyPair keyPairSubject = generateKeyPair();
@@ -40,6 +44,10 @@ public class CertificateDataUtils {
         return null;
     }
 
+    /**
+     * Kreira informacije o izdavacu sertifikata koje se koriste za generisanje sertifikata
+     * @return IssuerData objekat sa odgovarajucim informacijama
+     */
     public IssuerData generateIssuerData() {
         KeyPair issuerKey = generateKeyPair();
         X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
@@ -55,6 +63,10 @@ public class CertificateDataUtils {
         return new IssuerData(builder.build(),issuerKey.getPrivate());
     }
 
+    /**
+     * Generise par public/private key
+     * @return par od kojeg je moguce preko .getPrivate() i .getPublic() dobiti pojedinacne kljuceve
+     */
     private KeyPair generateKeyPair() {
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");

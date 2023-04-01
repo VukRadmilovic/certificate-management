@@ -31,7 +31,6 @@ public class ValidationErrorsHandler {
             sb.append(fe.getField()).append(" ");
             sb.append(error.getDefaultMessage()).append("!\n");
         }
-
         return new ResponseEntity<>(new ResponseMessage(sb.toString()), HttpStatus.BAD_REQUEST);
     }
 
