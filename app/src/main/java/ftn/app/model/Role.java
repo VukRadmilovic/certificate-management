@@ -6,19 +6,21 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import java.io.Serial;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="ROLE")
 public class Role implements GrantedAuthority {
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 	@Id
-    @Column(name="id")
+    @Column(unique = true,nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name="name")
+    @Column(nullable = false)
     String name;
 
     @JsonIgnore

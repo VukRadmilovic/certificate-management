@@ -1,66 +1,81 @@
 package ftn.app.util.certificateUtils;
 
 import ftn.app.model.IssuerData;
+import ftn.app.model.OrganizationData;
 import ftn.app.model.SubjectData;
+import ftn.app.model.User;
+import ftn.app.repository.CertificateRepository;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.springframework.stereotype.Component;
 
 import java.security.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 
 @Component
 public class CertificateDataUtils {
 
+    private final CertificateRepository certificateRepository;
+
+    public CertificateDataUtils(CertificateRepository certificateRepository) {
+        this.certificateRepository = certificateRepository;
+    }
+
     /**
      * Kreira informacije o samom sertifikatu koje se koriste za generisanje sertifikata
+     * @param requestMaker - korisnik koji zahteva sertifikat
+     * @param organizationData - podaci o organizaciji korisnika koji zahteva sertifikat
+     * @param validUntil - datum do kog vazi sertifikat
      * @return SubjectData objekat sa odgovarajucim informacijama
      */
-    public SubjectData generateSubjectData() {
-        try {
-            KeyPair keyPairSubject = generateKeyPair();
+    public SubjectData generateSubjectData(User requestMaker, OrganizationData organizationData, Date validUntil) {
+        KeyPair keyPairSubject = generateKeyPair();
+        String serialNumber = generateSerialNumber();
+        return new SubjectData(keyPairSubject.getPublic(), generateX500Name(requestMaker,organizationData), serialNumber, new Date(), validUntil);
+    }
 
-            SimpleDateFormat iso8601Formater = new SimpleDateFormat("yyyy-MM-dd");
-            Date startDate = iso8601Formater.parse("2022-03-01");
-            Date endDate = iso8601Formater.parse("2024-03-01");
-            String sn = "1";
+    /***
+     * Generise X500 ime korisnika koji zahteva izdavanje sertifikata/ korisnika koji je vlasnik sertifikata koji ga potpisuje
+     * @param user - konkretan korisnik
+     * @param organizationData - podaci o organizaciji korisnika
+     * @return X500 ime korisnika (koristi se za generisanje sertifikata)
+     */
+    private X500Name generateX500Name(User user, OrganizationData organizationData){
+        X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
+        builder.addRDN(BCStyle.CN, user.getName() + " " + user.getSurname());
+        builder.addRDN(BCStyle.SURNAME, user.getSurname());
+        builder.addRDN(BCStyle.GIVENNAME, user.getName());
+        builder.addRDN(BCStyle.O, organizationData.getName());
+        builder.addRDN(BCStyle.OU, organizationData.getUnit());
+        builder.addRDN(BCStyle.C, organizationData.getCountryCode());
+        builder.addRDN(BCStyle.E, user.getName());
+        builder.addRDN(BCStyle.UID, user.getId().toString());
+        return builder.build();
+    }
 
-            X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
-            builder.addRDN(BCStyle.CN, "Dracooya");
-            builder.addRDN(BCStyle.SURNAME, "Varga");
-            builder.addRDN(BCStyle.GIVENNAME, "Maja");
-            builder.addRDN(BCStyle.O, "UNS-FTN");
-            builder.addRDN(BCStyle.OU, "Katedra za informatiku");
-            builder.addRDN(BCStyle.C, "RS");
-            builder.addRDN(BCStyle.E, "maja.varga@uns.ac.rs");
-            builder.addRDN(BCStyle.UID, "654321");
-            return new SubjectData(keyPairSubject.getPublic(), builder.build(), sn, startDate, endDate);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
+    /**
+     * Generise jedinstven serijski broj sertifikata
+     * @return jednistven serijski broj sertifikata (serialNumber)
+     */
+    private String generateSerialNumber() {
+        String sn = "";
+        do {
+            sn = Integer.toString(new Random().nextInt(1000000) + 1);
+        } while (certificateRepository.findBySerialNumber(sn).isPresent());
+        return sn;
     }
 
     /**
      * Kreira informacije o izdavacu sertifikata koje se koriste za generisanje sertifikata
+     * @param issuer - korisnik koji je vlasnik sertifikata koji treba da potpise neki drugi sertifikat
+     * @param organizationData - podaci o organizaciji issuer-a
      * @return IssuerData objekat sa odgovarajucim informacijama
      */
-    public IssuerData generateIssuerData() {
+    public IssuerData generateIssuerData(User issuer, OrganizationData organizationData) {
         KeyPair issuerKey = generateKeyPair();
-        X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
-        builder.addRDN(BCStyle.CN, "Goran Sladic");
-        builder.addRDN(BCStyle.SURNAME, "Sladic");
-        builder.addRDN(BCStyle.GIVENNAME, "Goran");
-        builder.addRDN(BCStyle.O, "UNS-FTN");
-        builder.addRDN(BCStyle.OU, "Katedra za informatiku");
-        builder.addRDN(BCStyle.C, "RS");
-        builder.addRDN(BCStyle.E, "sladicg@uns.ac.rs");
-        builder.addRDN(BCStyle.UID, "123456");
-
-        return new IssuerData(builder.build(),issuerKey.getPrivate());
+        return new IssuerData(generateX500Name(issuer,organizationData),issuerKey.getPrivate());
     }
 
     /**

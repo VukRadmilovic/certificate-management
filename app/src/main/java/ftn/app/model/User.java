@@ -6,7 +6,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -22,20 +21,27 @@ import java.util.Objects;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", unique=true, nullable=false)
+    @Column(unique=true, nullable=false)
     private Integer id;
 
-    @Column (name = "email", nullable = false, unique = true)
+    @Column (nullable = false, unique = true)
     private String email;
 
-    @Column (name = "password", nullable = false)
+    @Column (nullable = false)
     private String password;
 
-    @Column (name = "lastPasswordResetDate")
+    @Column (nullable = false)
+    private String name;
+
+    @Column (nullable = false)
+    private String surname;
+
+    @Column (nullable = false)
+    private String phoneNumber;
+
+    @Column ()
     private Date lastPasswordResetDate;
 
-    @Column (name = "resetPasswordTokenExpiration")
-    private LocalDateTime resetPasswordTokenExpiration;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role",
