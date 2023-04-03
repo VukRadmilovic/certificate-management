@@ -34,6 +34,9 @@ public class CertificateRequest {
     private CertificateType certificateType;
 
     @Column(nullable = false)
+    private Date dateRequested;
+    
+    @Column(nullable = false)
     private Date validUntil;
 
     @Column(nullable = false)
@@ -51,6 +54,15 @@ public class CertificateRequest {
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         CertificateRequest certificateRequest = (CertificateRequest) o;
         return id != null && Objects.equals(id, certificateRequest.id);
+    }
+
+    public OrganizationData parseOrganizationData(){
+        String[] tokens = organizationData.split("\\|");
+        return new OrganizationData(tokens[0],tokens[1],tokens[2]);
+    }
+
+    public void writeOrganizationData(OrganizationData data){
+        organizationData = data.getName() + "|" + data.getUnit() + "|" + data.getCountryCode();
     }
 
 }
