@@ -23,7 +23,11 @@ public class CertificateRequestDetailsDTOMapper {
                 .setMatchingStrategy(MatchingStrategies.STANDARD);
     }
 
-    public static CertificateRequestDetailsDTO fromRequestToDTO(CertificateRequest model) { return modelMapper.map(model, CertificateRequestDetailsDTO.class); }
+    public static CertificateRequestDetailsDTO fromRequestToDTO(CertificateRequest model) {
+        CertificateRequestDetailsDTO dto = modelMapper.map(model, CertificateRequestDetailsDTO.class);
+        dto.getRequester().setFullName(model.getRequester().getName() + " " + model.getRequester().getSurname());
+        dto.generateOrganizationData(model.getOrganizationData());
+        return dto; }
 
     public static CertificateRequest fromDTOToRequest(CertificateRequestDetailsDTO dto) { return modelMapper.map(dto,CertificateRequest.class); }
 }

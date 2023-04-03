@@ -38,6 +38,7 @@ public class Certificate {
     private Date validUntil;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private CertificateType certificateType;
 
     @Column(nullable = false)

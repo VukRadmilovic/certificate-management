@@ -2,6 +2,8 @@ package ftn.app.mapper;
 
 import ftn.app.dto.CertificateRequestDTO;
 import ftn.app.model.CertificateRequest;
+import ftn.app.model.OrganizationData;
+import ftn.app.util.OrganizationDataUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration;
 import org.modelmapper.convention.MatchingStrategies;
@@ -20,19 +22,14 @@ public class CertificateRequestDTOMapper {
                 .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE)
                 .setMatchingStrategy(MatchingStrategies.STANDARD);
 
-        modelMapper.typeMap(CertificateRequest.class, CertificateRequestDTO.class).addMappings(mapper -> {
-            mapper.map(CertificateRequest::getOrganizationData,
-                    CertificateRequestDTO::generateOrganizationData);
-        });
-
-        modelMapper.typeMap(CertificateRequestDTO.class, CertificateRequest.class).addMappings(mapper -> {
-            mapper.map(CertificateRequestDTO::getOrganizationData,
-                    CertificateRequest::generateOrganizationData);
-        });
     }
 
     public static CertificateRequestDTO fromRequestToDTO(CertificateRequest model) { return modelMapper.map(model, CertificateRequestDTO.class); }
 
-    public static CertificateRequest fromDTOToRequest(CertificateRequestDTO dto) { return modelMapper.map(dto,CertificateRequest.class); }
+    public static CertificateRequest fromDTOToRequest(CertificateRequestDTO dto) {
+        CertificateRequest request = modelMapper.map(dto,CertificateRequest.class);
+        request.setOrganizationData(OrganizationDataUtils.writeOrganizationData(dto.getOrganizationData()));
+        return request;
+    }
 
 }

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -17,20 +18,21 @@ import java.util.Date;
 @NoArgsConstructor
 public class CertificateRequestDTO {
 
-    @NotBlank
     private String issuerSerialNumber;
 
-    @NotBlank
+    @NotNull
     private CertificateType certificateType;
 
     @Valid
+    @NotNull
     private OrganizationData organizationData;
 
     @Valid
+    @NotNull
     private Date validUntil;
 
     public void generateOrganizationData(String data) {
-        organizationData = OrganizationDataUtils.parseOrganizationData(data);
+        this.organizationData = OrganizationDataUtils.parseOrganizationData(data);
     }
 
 }

@@ -5,6 +5,7 @@ import ftn.app.dto.CertificateRequestDetailsDTO;
 import ftn.app.mapper.CertificateRequestDTOMapper;
 import ftn.app.mapper.CertificateRequestDetailsDTOMapper;
 import ftn.app.model.*;
+import ftn.app.model.enums.CertificateType;
 import ftn.app.model.enums.RequestStatus;
 import ftn.app.repository.CertificateRepository;
 import ftn.app.repository.CertificateRequestRepository;
@@ -53,21 +54,35 @@ public class CertificateService implements ICertificateService {
     @Override
     public CertificateRequestDetailsDTO requestCertificate(CertificateRequestDTO requestDTO, User requester) {
 
-        Certificate issuer = certificateRepository.findBySerialNumber(requestDTO.getIssuerSerialNumber()).get();
-        if(requestDTO.getValidUntil().before(DateUtil.getDateWithoutTime(new Date())) || requestDTO.getValidUntil().after(issuer.getValidUntil())) {
+        if(requestDTO.getValidUntil().before(DateUtil.getDateWithoutTime(new Date()))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,messageSource.getMessage("request.dateInvalid", null, Locale.getDefault()));
         }
-        if(isValidCertificate(issuer,true)) {
-            CertificateRequest request = saveRequest(requestDTO,requester,issuer);
-            if(requester.getEmail().equals(issuer.getOwnerEmail()) || requester.getRoles().get(0).getName().equals("ROLE_ADMIN")) {
-               saveCertificate(requestDTO,requester);
-               return CertificateRequestDetailsDTOMapper.fromRequestToDTO(request);
+        Certificate issuer;
+        if(requestDTO.getIssuerSerialNumber() != null) {
+            issuer = certificateRepository.findBySerialNumber(requestDTO.getIssuerSerialNumber()).get();
+            if(requestDTO.getValidUntil().after(issuer.getValidUntil())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,messageSource.getMessage("request.dateInvalid", null, Locale.getDefault()));
+            }
+            if(issuer.getCertificateType().equals(CertificateType.END)){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,messageSource.getMessage("certificate.endTypeError", null, Locale.getDefault()));
+            }
+
+            if(isValidCertificate(issuer,true)) {
+                CertificateRequest request = saveRequest(requestDTO,requester,issuer);
+                if(requester.getEmail().equals(issuer.getOwnerEmail()) || requester.getRoles().get(0).getName().equals("ROLE_ADMIN")) {
+                    saveCertificate(requestDTO,requester);
+                }
+                return CertificateRequestDetailsDTOMapper.fromRequestToDTO(request);
+            }
+            else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,messageSource.getMessage("certificate.notValid", null, Locale.getDefault()));
             }
         }
         else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,messageSource.getMessage("certificate.notValid", null, Locale.getDefault()));
+            CertificateRequest request = saveRequest(requestDTO,requester,null);
+            saveCertificate(requestDTO,requester);
+            return CertificateRequestDetailsDTOMapper.fromRequestToDTO(request);
         }
-        return null;
     }
 
     /**
@@ -113,15 +128,18 @@ public class CertificateService implements ICertificateService {
         request.setDenialReason(null);
         request.setDateRequested(DateUtil.getDateWithoutTime(new Date()));
         request.setRequester(requester);
-        if(requester.getEmail().equals(issuer.getOwnerEmail())) request.setRequestStatus(RequestStatus.ACCEPTED);
-        else if(requester.getRoles().get(0).getName().equals("ROLE_ADMIN")) request.setRequestStatus(RequestStatus.ACCEPTED);
+        if(requester.getRoles().get(0).getName().equals("ROLE_ADMIN")) request.setRequestStatus(RequestStatus.ACCEPTED);
+        else if(requester.getEmail().equals(issuer.getOwnerEmail())) request.setRequestStatus(RequestStatus.ACCEPTED);
         else request.setRequestStatus(RequestStatus.PENDING);
         return certificateRequestRepository.save(request);
     }
 
     @Override
     public Certificate saveCertificate(CertificateRequestDTO requestDTO, User requester) {
-        Certificate issuer = certificateRepository.findBySerialNumber(requestDTO.getIssuerSerialNumber()).get();
+        Certificate issuer = null;
+        if(requestDTO.getIssuerSerialNumber() != null) {
+            issuer = certificateRepository.findBySerialNumber(requestDTO.getIssuerSerialNumber()).get();
+        }
         SubjectData certificateSubject = certificateDataUtils.generateSubjectData(requester, requestDTO.getOrganizationData(), requestDTO.getValidUntil());
         Certificate newCertificate = new Certificate();
         newCertificate.setSerialNumber(certificateSubject.getSerialNumber());
@@ -133,7 +151,10 @@ public class CertificateService implements ICertificateService {
         newCertificate.setOwnerEmail(requester.getEmail());
         Certificate certificate = certificateRepository.save(newCertificate);
 
-        User issuerOwner = userRepository.findByEmail(issuer.getOwnerEmail()).get();
+        User issuerOwner = requester;
+        if(issuer != null) {
+            issuerOwner = userRepository.findByEmail(issuer.getOwnerEmail()).get();
+        }
         IssuerData issuerData = certificateDataUtils.generateIssuerData(issuerOwner, requestDTO.getOrganizationData());
         X509Certificate certificateKS = certificateUtils.generateCertificate(certificateSubject, issuerData);
         keystoreUtils.saveCertificate(generateAlias(requester,newCertificate),

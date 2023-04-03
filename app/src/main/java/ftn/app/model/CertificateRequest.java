@@ -24,7 +24,7 @@ public class CertificateRequest {
     @Column(unique=true, nullable=false)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column()
     private String issuerSerialNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,6 +32,7 @@ public class CertificateRequest {
     private User requester;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private CertificateType certificateType;
 
     @Column(nullable = false)
@@ -44,6 +45,7 @@ public class CertificateRequest {
     private String organizationData;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private RequestStatus requestStatus;
 
     @Column()
@@ -58,7 +60,7 @@ public class CertificateRequest {
     }
 
     public void generateOrganizationData(OrganizationData data) {
-        organizationData = OrganizationDataUtils.writeOrganizationData(data);
+        this.organizationData = OrganizationDataUtils.writeOrganizationData(data);
     }
 
 }
