@@ -3,6 +3,7 @@ package ftn.app.dto;
 
 import ftn.app.model.OrganizationData;
 import ftn.app.model.enums.CertificateType;
+import ftn.app.util.OrganizationDataUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,5 +28,9 @@ public class CertificateRequestDTO {
 
     @Valid
     private Date validUntil;
+
+    public void generateOrganizationData(String data) {
+        organizationData = OrganizationDataUtils.parseOrganizationData(data);
+    }
 
 }

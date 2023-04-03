@@ -5,7 +5,7 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -25,17 +25,17 @@ public class Certificate {
     @Column(unique = true, nullable = false)
     private String serialNumber;
 
-    @Column(nullable = false)
+    @Column()
     private String issuerSerialNumber;
 
     @Column(nullable = false)
     private boolean isValid;
 
     @Column(nullable = false)
-    private LocalDateTime validFrom;
+    private Date validFrom;
 
     @Column(nullable = false)
-    private LocalDateTime validUntil;
+    private Date validUntil;
 
     @Column(nullable = false)
     private CertificateType certificateType;

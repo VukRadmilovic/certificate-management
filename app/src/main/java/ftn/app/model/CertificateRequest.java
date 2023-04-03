@@ -2,6 +2,7 @@ package ftn.app.model;
 
 import ftn.app.model.enums.CertificateType;
 import ftn.app.model.enums.RequestStatus;
+import ftn.app.util.OrganizationDataUtils;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -35,7 +36,7 @@ public class CertificateRequest {
 
     @Column(nullable = false)
     private Date dateRequested;
-    
+
     @Column(nullable = false)
     private Date validUntil;
 
@@ -56,13 +57,8 @@ public class CertificateRequest {
         return id != null && Objects.equals(id, certificateRequest.id);
     }
 
-    public OrganizationData parseOrganizationData(){
-        String[] tokens = organizationData.split("\\|");
-        return new OrganizationData(tokens[0],tokens[1],tokens[2]);
-    }
-
-    public void writeOrganizationData(OrganizationData data){
-        organizationData = data.getName() + "|" + data.getUnit() + "|" + data.getCountryCode();
+    public void generateOrganizationData(OrganizationData data) {
+        organizationData = OrganizationDataUtils.writeOrganizationData(data);
     }
 
 }
