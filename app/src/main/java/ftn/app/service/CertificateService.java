@@ -10,6 +10,7 @@ import ftn.app.repository.CertificateRepository;
 import ftn.app.repository.CertificateRequestRepository;
 import ftn.app.repository.UserRepository;
 import ftn.app.service.interfaces.ICertificateService;
+import ftn.app.util.DateUtil;
 import ftn.app.util.KeystoreUtils;
 import ftn.app.util.certificateUtils.CertificateDataUtils;
 import ftn.app.util.certificateUtils.CertificateUtils;
@@ -53,7 +54,7 @@ public class CertificateService implements ICertificateService {
     public CertificateRequestDetailsDTO requestCertificate(CertificateRequestDTO requestDTO, User requester) {
 
         Certificate issuer = certificateRepository.findBySerialNumber(requestDTO.getIssuerSerialNumber()).get();
-        if(requestDTO.getValidUntil().before(new Date()) || requestDTO.getValidUntil().after(issuer.getValidUntil())) {
+        if(requestDTO.getValidUntil().before(DateUtil.getDateWithoutTime(new Date())) || requestDTO.getValidUntil().after(issuer.getValidUntil())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,messageSource.getMessage("request.dateInvalid", null, Locale.getDefault()));
         }
         if(isValidCertificate(issuer,true)) {
@@ -74,7 +75,7 @@ public class CertificateService implements ICertificateService {
         if(!isOverallValid) {
             return false;
         }
-        boolean hasExpired = certificate.getValidUntil().before(new Date());
+        boolean hasExpired = certificate.getValidUntil().before(DateUtil.getDateWithoutTime(new Date()));
         boolean isValid = certificate.isValid();
         if(!hasExpired && isValid)
         {
@@ -104,7 +105,7 @@ public class CertificateService implements ICertificateService {
     public CertificateRequest saveRequest(CertificateRequestDTO requestDTO, User requester, Certificate issuer) {
         CertificateRequest request = CertificateRequestDTOMapper.fromDTOToRequest(requestDTO);
         request.setDenialReason(null);
-        request.setDateRequested(new Date());
+        request.setDateRequested(DateUtil.getDateWithoutTime(new Date()));
         request.setRequester(requester);
         if(requester.getEmail().equals(issuer.getOwnerEmail())) request.setRequestStatus(RequestStatus.ACCEPTED);
         else if(requester.getRoles().get(0).getName().equals("ROLE_ADMIN")) request.setRequestStatus(RequestStatus.ACCEPTED);

@@ -26,14 +26,11 @@ public class CertificateController {
 
     private CertificateService certificateService;
     private MessageSource messageSource;
-    private TokenUtils tokenUtils;
 
     public CertificateController(CertificateService certificateService,
-                                 MessageSource messageSource,
-                                 TokenUtils tokenUtils) {
+                                 MessageSource messageSource) {
         this.certificateService = certificateService;
         this.messageSource = messageSource;
-        this.tokenUtils = tokenUtils;
     }
 
     @PostMapping(value = "/request", consumes = "application/json")

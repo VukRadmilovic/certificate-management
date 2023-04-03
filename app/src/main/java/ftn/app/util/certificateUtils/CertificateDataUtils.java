@@ -5,6 +5,7 @@ import ftn.app.model.OrganizationData;
 import ftn.app.model.SubjectData;
 import ftn.app.model.User;
 import ftn.app.repository.CertificateRepository;
+import ftn.app.util.DateUtil;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -33,7 +34,11 @@ public class CertificateDataUtils {
     public SubjectData generateSubjectData(User requestMaker, OrganizationData organizationData, Date validUntil) {
         KeyPair keyPairSubject = generateKeyPair();
         String serialNumber = generateSerialNumber();
-        return new SubjectData(keyPairSubject.getPublic(), generateX500Name(requestMaker,organizationData), serialNumber, new Date(), validUntil);
+        return new SubjectData(keyPairSubject.getPublic(),
+                generateX500Name(requestMaker,organizationData),
+                serialNumber,
+                DateUtil.getDateWithoutTime(new Date()),
+                validUntil);
     }
 
     /***

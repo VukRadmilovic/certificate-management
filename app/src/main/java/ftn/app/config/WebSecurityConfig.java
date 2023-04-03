@@ -61,6 +61,7 @@ public class WebSecurityConfig {
         http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint);
     	http.authorizeRequests()
 					.antMatchers("/api/user/login").permitAll()
+				.antMatchers(HttpMethod.POST,"/api/certificate/request").hasAnyRole("ADMIN","AUTHENTICATED")
 				.anyRequest().authenticated().and()
 				.cors().and()
 				.addFilterBefore(new TokenAuthenticationFilter(tokenUtils,  userService), BasicAuthenticationFilter.class);
