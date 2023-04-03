@@ -70,6 +70,12 @@ public class CertificateService implements ICertificateService {
         return null;
     }
 
+    /**
+     * Rekurzivno prolazi kroz lanac sertifikata i proverava da li su validni
+     * @param certificate pocetni sertifikat u lancu
+     * @param isOverallValid promenljiva koja cuva stanja validnosti od ranijih irteracija rekurzije
+     * @return true ako je ceo lanac validan
+     */
     @Override
     public boolean isValidCertificate(Certificate certificate, boolean isOverallValid) {
         if(!isOverallValid) {
