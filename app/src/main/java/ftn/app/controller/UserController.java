@@ -73,8 +73,8 @@ public class UserController {
             userService.Register(user);
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
         }
-        catch (HttpClientErrorException.BadRequest ex){
-            return new ResponseEntity<>(messageSource.getMessage("badRequest", null, Locale.getDefault()), HttpStatus.BAD_REQUEST);
+        catch (BadCredentialsException ex){
+            return new ResponseEntity<>(messageSource.getMessage("user.email.exists", null, Locale.getDefault()), HttpStatus.BAD_REQUEST);
         }
     }
 }

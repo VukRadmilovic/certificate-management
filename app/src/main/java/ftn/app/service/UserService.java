@@ -3,6 +3,7 @@ package ftn.app.service;
 import ftn.app.repository.UserRepository;
 import ftn.app.model.User;
 import ftn.app.service.interfaces.IUserService;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,9 @@ public class UserService implements IUserService {
 
     @Override
     public User Register(User user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()){
+            throw new BadCredentialsException(String.format("Email '%s' already in use"));
+        }
         return userRepository.save(user);
     }
 }
