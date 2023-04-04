@@ -2,12 +2,12 @@ package ftn.app.controller;
 
 import ftn.app.dto.CertificateRequestDTO;
 import ftn.app.dto.CertificateRequestDetailsDTO;
-import ftn.app.dto.TokenDTO;
+import ftn.app.model.Certificate;
 import ftn.app.model.ResponseMessage;
 import ftn.app.model.User;
 import ftn.app.model.enums.CertificateType;
 import ftn.app.service.CertificateService;
-import ftn.app.util.TokenUtils;
+import ftn.app.util.KeystoreUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +26,14 @@ public class CertificateController {
 
     private CertificateService certificateService;
     private MessageSource messageSource;
+    private KeystoreUtils keystoreUtils;
 
     public CertificateController(CertificateService certificateService,
-                                 MessageSource messageSource) {
+                                 MessageSource messageSource,
+                                 KeystoreUtils keystoreUtils) {
         this.certificateService = certificateService;
         this.messageSource = messageSource;
+        this.keystoreUtils = keystoreUtils;
     }
 
     @PostMapping(value = "/request", consumes = "application/json")
