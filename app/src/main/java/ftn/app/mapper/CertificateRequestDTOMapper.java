@@ -24,7 +24,11 @@ public class CertificateRequestDTOMapper {
 
     }
 
-    public static CertificateRequestDTO fromRequestToDTO(CertificateRequest model) { return modelMapper.map(model, CertificateRequestDTO.class); }
+    public static CertificateRequestDTO fromRequestToDTO(CertificateRequest model) {
+        CertificateRequestDTO dto = modelMapper.map(model, CertificateRequestDTO.class);
+        dto.setOrganizationData(OrganizationDataUtils.parseOrganizationData(model.getOrganizationData()));
+        return dto;
+    }
 
     public static CertificateRequest fromDTOToRequest(CertificateRequestDTO dto) {
         CertificateRequest request = modelMapper.map(dto,CertificateRequest.class);

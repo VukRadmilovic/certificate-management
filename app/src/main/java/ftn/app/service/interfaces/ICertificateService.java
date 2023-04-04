@@ -20,4 +20,6 @@ public interface ICertificateService {
     List<CertificateRequestDetailsDTO> getUserRequests(User user);
 
     List<CertificateRequestDetailsDTO> getAllRequests();
+    CertificateRequestDetailsDTO denyRequest(Integer requestId, String reason, User user);
+    CertificateRequestDetailsDTO acceptRequest(Integer requestId, User user);
 }

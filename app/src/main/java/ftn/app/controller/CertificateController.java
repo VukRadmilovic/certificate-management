@@ -1,8 +1,10 @@
 package ftn.app.controller;
 
 import ftn.app.dto.CertificateRequestDTO;
+import ftn.app.dto.CertificateRequestDenialDTO;
 import ftn.app.dto.CertificateRequestDetailsDTO;
 import ftn.app.model.Certificate;
+import ftn.app.model.CertificateRequest;
 import ftn.app.model.ResponseMessage;
 import ftn.app.model.Role;
 import ftn.app.model.User;
@@ -50,7 +52,29 @@ public class CertificateController {
         catch (ResponseStatusException ex) {
             return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
         }
+    }
 
+    @PutMapping(value = "/request/deny/{id}", consumes = "application/json")
+    public ResponseEntity<?> denyCertificateRequest(@PathVariable Integer id,
+                                                    @Valid @RequestBody CertificateRequestDenialDTO denialDTO) {
+        try {
+            User denier = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            CertificateRequestDetailsDTO request = certificateService.denyRequest(id, denialDTO.getDenialReason(), denier);
+            return new ResponseEntity<>(request, HttpStatus.OK);
+        } catch (ResponseStatusException ex) {
+            return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
+        }
+    }
+
+    @PutMapping(value = "/request/accept/{id}")
+    public ResponseEntity<?> acceptCertificateRequest(@PathVariable Integer id) {
+        try {
+            User accepter = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            CertificateRequestDetailsDTO request = certificateService.acceptRequest(id, accepter);
+            return new ResponseEntity<>(request, HttpStatus.OK);
+        } catch (ResponseStatusException ex) {
+            return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
+        }
     }
     @GetMapping(value = "/certificates")
     public ResponseEntity<?> getCertificates(){
