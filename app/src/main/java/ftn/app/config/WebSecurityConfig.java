@@ -61,7 +61,9 @@ public class WebSecurityConfig {
         http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint);
     	http.authorizeRequests()
 					.antMatchers("/api/user/login").permitAll()
-				.antMatchers("/api/user/register").permitAll()
+				.antMatchers(HttpMethod.POST, "api/user/register").permitAll()
+				.antMatchers( HttpMethod.GET,"api/certificate/requests").hasAnyRole("ADMIN","AUTHENTICATED")
+				.antMatchers( HttpMethod.GET,"api/certificate/certificates").hasAnyRole("ADMIN","AUTHENTICATED")
 				.antMatchers(HttpMethod.POST,"/api/certificate/request").hasAnyRole("ADMIN","AUTHENTICATED")
 				.anyRequest().authenticated().and()
 				.cors().and()

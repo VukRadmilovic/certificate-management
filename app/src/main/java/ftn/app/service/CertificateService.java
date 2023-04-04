@@ -1,7 +1,9 @@
 package ftn.app.service;
 
+import ftn.app.dto.CertificateDetailsDTO;
 import ftn.app.dto.CertificateRequestDTO;
 import ftn.app.dto.CertificateRequestDetailsDTO;
+import ftn.app.mapper.CertificateDetailsDTOMapper;
 import ftn.app.mapper.CertificateRequestDTOMapper;
 import ftn.app.mapper.CertificateRequestDetailsDTOMapper;
 import ftn.app.model.*;
@@ -21,9 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.cert.X509Certificate;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CertificateService implements ICertificateService {
@@ -118,6 +118,37 @@ public class CertificateService implements ICertificateService {
         }
         else isOverallValid = false;
         return isOverallValid;
+    }
+
+    @Override
+    public List<CertificateDetailsDTO> getAllCertificates() {
+        List<Certificate> temp = certificateRepository.findAll();
+        List<CertificateDetailsDTO> certificateDetailsDTOS = new ArrayList<>();
+        for (Certificate c: temp) {
+            certificateDetailsDTOS.add(CertificateDetailsDTOMapper.fromCertificateToDTO(c));
+        }
+        return certificateDetailsDTOS;
+    }
+
+    @Override
+    public List<CertificateRequestDetailsDTO> getUserRequests(User user) {
+        List<CertificateRequest> temp = certificateRequestRepository.findAll();
+        List<CertificateRequestDetailsDTO> certificateRequestDetailsDTOS = new ArrayList<>();
+        for (CertificateRequest r:temp) {
+            if(r.getRequester().getId() == user.getId())
+                certificateRequestDetailsDTOS.add(CertificateRequestDetailsDTOMapper.fromRequestToDTO(r));
+        }
+        return certificateRequestDetailsDTOS;
+    }
+
+    @Override
+    public List<CertificateRequestDetailsDTO> getAllRequests() {
+        List<CertificateRequest> temp = certificateRequestRepository.findAll();
+        List<CertificateRequestDetailsDTO> certificateRequestDetailsDTOS = new ArrayList<>();
+        for (CertificateRequest r:temp) {
+            certificateRequestDetailsDTOS.add(CertificateRequestDetailsDTOMapper.fromRequestToDTO(r));
+        }
+        return certificateRequestDetailsDTOS;
     }
 
     private String generateAlias(User requester, Certificate certificate) {

@@ -68,7 +68,7 @@ public class UserController {
         try {
             User user = UserFullDTOMapper.fromDTOToUser(userRegister);
             Collection<Role> roles = null;
-            roles.add(new Role(0L, "ROLE_AUTHENTICATED"));
+            roles.add(new Role(1L, "ROLE_AUTHENTICATED"));
             userService.Register(user);
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
         }
