@@ -169,4 +169,37 @@ public class CertificateService implements ICertificateService {
                 certificateKS);
         return certificate;
     }
+
+    @Override
+    public CertificateRequestDetailsDTO denyRequest(Integer requestId, String reason, User denier) {
+        // Check if request exists
+        Optional<CertificateRequest> requestOptional = certificateRequestRepository.findById(requestId);
+        if (requestOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("request.doesNotExist", null, Locale.getDefault()));
+        }
+        CertificateRequest request = requestOptional.get();
+
+        // Check if request is pending
+        if (!request.getRequestStatus().equals(RequestStatus.PENDING)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, messageSource.getMessage("request.notPending", null, Locale.getDefault()));
+        }
+
+        // Check if issuer exists
+        Optional<Certificate> issuerOptional = certificateRepository.findBySerialNumber(request.getIssuerSerialNumber());
+        if (issuerOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("issuer.doesNotExist", null, Locale.getDefault()));
+        }
+        Certificate issuer = issuerOptional.get();
+
+        // Check if denier is the issuer certificate's owner
+        if (!issuer.getOwnerEmail().equals(denier.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, messageSource.getMessage("request.userNotIssuer", null, Locale.getDefault()));
+        }
+
+        request.setRequestStatus(RequestStatus.DENIED);
+        request.setDenialReason(reason);
+        certificateRequestRepository.save(request);
+
+        return CertificateRequestDetailsDTOMapper.fromRequestToDTO(request);
+    }
 }

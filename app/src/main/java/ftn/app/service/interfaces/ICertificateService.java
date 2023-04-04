@@ -12,4 +12,6 @@ public interface ICertificateService {
     CertificateRequest saveRequest(CertificateRequestDTO requestDTO, User requester, Certificate issuer);
     Certificate saveCertificate(CertificateRequestDTO requestDTO, User requester);
     boolean isValidCertificate(Certificate certificate, boolean isOverallValid);
+
+    CertificateRequestDetailsDTO denyRequest(Integer requestId, String reason, User user);
 }
