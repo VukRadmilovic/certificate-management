@@ -1,12 +1,16 @@
 package ftn.app.service;
 
+import ftn.app.config.WebSecurityConfig;
 import ftn.app.repository.UserRepository;
 import ftn.app.model.User;
 import ftn.app.service.interfaces.IUserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -17,6 +21,10 @@ public class UserService implements IUserService {
 
     public UserService(UserRepository userRepository){
         this.userRepository = userRepository;
+    }
+
+    private BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Override
@@ -32,8 +40,9 @@ public class UserService implements IUserService {
     @Override
     public User Register(User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()){
-            throw new BadCredentialsException(String.format("Email '%s' already in use"));
+            throw new ResponseStatusException(HttpStatus.FOUND);
         }
+        user.setPassword(passwordEncoder().encode(user.getPassword()));
         return userRepository.save(user);
     }
 }
