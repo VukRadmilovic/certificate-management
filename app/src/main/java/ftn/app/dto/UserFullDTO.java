@@ -3,27 +3,33 @@ package ftn.app.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserFullDTO {
-    @Valid
-    @NotNull
+    @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "{format}")
     private String email;
-    @Valid
-    @NotNull
+
+    @Length(max = 255, message = "{maxLength}")
+    @NotBlank(message = "{required}")
     private String password;
-    @Valid
-    @NotNull
+
+    @Length(max = 255, message = "{maxLength}")
+    @NotBlank(message = "{required}")
     private String name;
-    @Valid
-    @NotNull
+
+    @Length(max = 255, message = "{maxLength}")
+    @NotBlank(message = "{required}")
     private String surname;
-    @Valid
-    @NotNull
+
+    @Length(max = 255, message = "{maxLength}")
+    @NotBlank(message = "{required}")
     private String phoneNumber;
 }
