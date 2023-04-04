@@ -64,4 +64,15 @@ public class CertificateController {
             return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
         }
     }
+
+    @PutMapping(value = "/request/accept/{id}")
+    public ResponseEntity<?> acceptCertificateRequest(@PathVariable Integer id) {
+        try {
+            User accepter = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            CertificateRequestDetailsDTO request = certificateService.acceptRequest(id, accepter);
+            return new ResponseEntity<>(request, HttpStatus.OK);
+        } catch (ResponseStatusException ex) {
+            return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
+        }
+    }
 }

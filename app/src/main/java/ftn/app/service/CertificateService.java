@@ -159,7 +159,11 @@ public class CertificateService implements ICertificateService {
 
         User issuerOwner = requester;
         if(issuer != null) {
-            issuerOwner = userRepository.findByEmail(issuer.getOwnerEmail()).get();
+            Optional<User> issuerOwnerOpt = userRepository.findByEmail(issuer.getOwnerEmail());
+            if (issuerOwnerOpt.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, messageSource.getMessage("request.issuerOwnerNotFound", null, Locale.getDefault()));
+            }
+            issuerOwner = issuerOwnerOpt.get();
         }
         IssuerData issuerData = certificateDataUtils.generateIssuerData(issuerOwner, requestDTO.getOrganizationData());
         X509Certificate certificateKS = certificateUtils.generateCertificate(certificateSubject, issuerData);
@@ -172,6 +176,27 @@ public class CertificateService implements ICertificateService {
 
     @Override
     public CertificateRequestDetailsDTO denyRequest(Integer requestId, String reason, User denier) {
+        CertificateRequest request = validateRequestManagementAttempt(requestId, denier);
+
+        request.setRequestStatus(RequestStatus.DENIED);
+        request.setDenialReason(reason);
+        certificateRequestRepository.save(request);
+
+        return CertificateRequestDetailsDTOMapper.fromRequestToDTO(request);
+    }
+
+    @Override
+    public CertificateRequestDetailsDTO acceptRequest(Integer requestId, User accepter) {
+        CertificateRequest request = validateRequestManagementAttempt(requestId, accepter);
+
+        saveCertificate(CertificateRequestDTOMapper.fromRequestToDTO(request), request.getRequester());
+        request.setRequestStatus(RequestStatus.ACCEPTED);
+        certificateRequestRepository.save(request);
+
+        return CertificateRequestDetailsDTOMapper.fromRequestToDTO(request);
+    }
+
+    private CertificateRequest validateRequestManagementAttempt(Integer requestId, User manager) {
         // Check if request exists
         Optional<CertificateRequest> requestOptional = certificateRequestRepository.findById(requestId);
         if (requestOptional.isEmpty()) {
@@ -191,15 +216,10 @@ public class CertificateService implements ICertificateService {
         }
         Certificate issuer = issuerOptional.get();
 
-        // Check if denier is the issuer certificate's owner
-        if (!issuer.getOwnerEmail().equals(denier.getEmail())) {
+        // Check if manager is the issuer certificate's owner
+        if (!issuer.getOwnerEmail().equals(manager.getEmail())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, messageSource.getMessage("request.userNotIssuer", null, Locale.getDefault()));
         }
-
-        request.setRequestStatus(RequestStatus.DENIED);
-        request.setDenialReason(reason);
-        certificateRequestRepository.save(request);
-
-        return CertificateRequestDetailsDTOMapper.fromRequestToDTO(request);
+        return request;
     }
 }
