@@ -2,6 +2,10 @@ package ftn.app.controller;
 
 import ftn.app.dto.LoginDTO;
 import ftn.app.dto.TokenDTO;
+import ftn.app.dto.UserFullDTO;
+import ftn.app.mapper.UserFullDTOMapper;
+import ftn.app.model.Role;
+import ftn.app.service.UserService;
 import ftn.app.util.TokenUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.context.MessageSource;
@@ -14,8 +18,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.Locale;
 
 @CrossOrigin("http://localhost:4200")
@@ -26,13 +32,16 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final TokenUtils tokenUtils;
     private final MessageSource messageSource;
+    private final UserService userService;
 
     public UserController(AuthenticationManager authenticationManager,
                           TokenUtils tokenUtils,
-                          MessageSource messageSource) {
+                          MessageSource messageSource,
+                          UserService userService) {
         this.authenticationManager = authenticationManager;
         this.tokenUtils = tokenUtils;
         this.messageSource = messageSource;
+        this.userService = userService;
     }
 
     @PostMapping(value = "/login", consumes = "application/json")
@@ -51,6 +60,20 @@ public class UserController {
         }
         catch (BadCredentialsException ex) {
             return new ResponseEntity<>(messageSource.getMessage("user.notFound", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping(value = "/register", consumes = "application/json")
+    public ResponseEntity<?> register(@Valid @RequestBody UserFullDTO userRegister){
+        try {
+            User user = UserFullDTOMapper.fromDTOToUser(userRegister);
+            Collection<Role> roles = null;
+            roles.add(new Role(0L, "ROLE_AUTHENTICATED"));
+            userService.Register(user);
+            return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
+        }
+        catch (HttpClientErrorException.BadRequest ex){
+            return new ResponseEntity<>(messageSource.getMessage("badRequest", null, Locale.getDefault()), HttpStatus.BAD_REQUEST);
         }
     }
 }

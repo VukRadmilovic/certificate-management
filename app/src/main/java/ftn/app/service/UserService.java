@@ -27,4 +27,9 @@ public class UserService implements IUserService {
             return user.get();
         }
     }
+
+    @Override
+    public User Register(User user) {
+        return userRepository.save(user);
+    }
 }
