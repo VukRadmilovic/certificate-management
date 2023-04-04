@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
 
@@ -67,7 +68,7 @@ public class UserController {
     public ResponseEntity<?> register(@Valid @RequestBody UserFullDTO userRegister){
         try {
             User user = UserFullDTOMapper.fromDTOToUser(userRegister);
-            Collection<Role> roles = null;
+            Collection<Role> roles = new ArrayList<>();
             roles.add(new Role(1L, "ROLE_AUTHENTICATED"));
             userService.Register(user);
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
