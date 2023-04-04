@@ -5,6 +5,7 @@ import ftn.app.dto.TokenDTO;
 import ftn.app.dto.UserFullDTO;
 import ftn.app.mapper.UserFullDTOMapper;
 import ftn.app.model.Role;
+import ftn.app.repository.RoleRepository;
 import ftn.app.service.UserService;
 import ftn.app.util.TokenUtils;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -24,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 @CrossOrigin("http://localhost:4200")
@@ -35,15 +37,18 @@ public class UserController {
     private final TokenUtils tokenUtils;
     private final MessageSource messageSource;
     private final UserService userService;
+    private final RoleRepository roleRepository;
 
     public UserController(AuthenticationManager authenticationManager,
                           TokenUtils tokenUtils,
                           MessageSource messageSource,
-                          UserService userService) {
+                          UserService userService,
+                          RoleRepository roleRepository) {
         this.authenticationManager = authenticationManager;
         this.tokenUtils = tokenUtils;
         this.messageSource = messageSource;
         this.userService = userService;
+        this.roleRepository = roleRepository;
     }
 
     @PostMapping(value = "/login", consumes = "application/json")
@@ -69,8 +74,9 @@ public class UserController {
     public ResponseEntity<?> register(@Valid @RequestBody UserFullDTO userRegister){
         try {
             User user = UserFullDTOMapper.fromDTOToUser(userRegister);
-            Collection<Role> roles = new ArrayList<>();
-            roles.add(new Role(1L, "ROLE_AUTHENTICATED"));
+            List<Role> roles = new ArrayList<>();
+            roles.add(roleRepository.findByName("ROLE_AUTHENTICATED").get());
+            user.setRoles(roles);
             userService.Register(user);
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
         }
