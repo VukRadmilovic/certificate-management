@@ -4,11 +4,8 @@ import ftn.app.dto.CertificateDetailsDTO;
 import ftn.app.dto.CertificateRequestDTO;
 import ftn.app.dto.CertificateRequestDetailsDTO;
 import ftn.app.mapper.CertificateDetailsDTOMapper;
-import ftn.app.mapper.CertificateRequestDTOMapper;
 import ftn.app.mapper.CertificateRequestDetailsDTOMapper;
 import ftn.app.model.*;
-import ftn.app.model.enums.CertificateType;
-import ftn.app.model.enums.RequestStatus;
 import ftn.app.repository.CertificateRepository;
 import ftn.app.repository.CertificateRequestRepository;
 import ftn.app.repository.UserRepository;
@@ -52,45 +49,6 @@ public class CertificateService implements ICertificateService {
         this.keystoreUtils = keystoreUtils;
     }
 
-    @Override
-    public CertificateRequestDetailsDTO requestCertificate(CertificateRequestDTO requestDTO, User requester) {
-
-        if(requestDTO.getValidUntil().before(DateUtil.getDateWithoutTime(new Date()))) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,messageSource.getMessage("request.dateInvalid", null, Locale.getDefault()));
-        }
-        Optional<Certificate> issuerOpt;
-        Certificate issuer;
-        if(requestDTO.getIssuerSerialNumber() != null) {
-            issuerOpt = certificateRepository.findBySerialNumber(requestDTO.getIssuerSerialNumber());
-            if(issuerOpt.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,messageSource.getMessage("issuer.doesNotExist", null, Locale.getDefault()));
-            }
-            issuer = issuerOpt.get();
-            if(requestDTO.getValidUntil().after(issuer.getValidUntil())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,messageSource.getMessage("request.dateInvalid", null, Locale.getDefault()));
-            }
-            if(issuer.getCertificateType().equals(CertificateType.END)){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,messageSource.getMessage("certificate.endTypeError", null, Locale.getDefault()));
-            }
-
-            if(isValidCertificate(issuer,true)) {
-                CertificateRequest request = saveRequest(requestDTO,requester,issuer);
-                if(requester.getEmail().equals(issuer.getOwnerEmail()) || requester.getRoles().get(0).getName().equals("ROLE_ADMIN")) {
-                    saveCertificate(requestDTO,requester);
-                }
-                return CertificateRequestDetailsDTOMapper.fromRequestToDTO(request);
-            }
-            else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,messageSource.getMessage("certificate.notValid", null, Locale.getDefault()));
-            }
-        }
-        else {
-            CertificateRequest request = saveRequest(requestDTO,requester,null);
-            saveCertificate(requestDTO,requester);
-            return CertificateRequestDetailsDTOMapper.fromRequestToDTO(request);
-        }
-    }
-
     /**
      * Rekurzivno prolazi kroz lanac sertifikata i proverava da li su validni
      * @param certificate pocetni sertifikat u lancu
@@ -104,20 +62,38 @@ public class CertificateService implements ICertificateService {
         }
         boolean hasExpired = certificate.getValidUntil().before(DateUtil.getDateWithoutTime(new Date()));
         boolean isValid = certificate.isValid();
-        if(!hasExpired && isValid)
-        {
-            isOverallValid = true;
+        if(!hasExpired && isValid) {
             if(certificate.getIssuerSerialNumber() != null) {
-                Certificate issuer = certificateRepository.findBySerialNumber(certificate.getIssuerSerialNumber()).get();
-                if(certificate.getValidUntil().after(issuer.getValidUntil())) {
-                    isOverallValid = false;
+                Optional<Certificate> issuerOpt = certificateRepository.findBySerialNumber(certificate.getIssuerSerialNumber());
+                if(issuerOpt.isEmpty()) {
                     return false;
                 }
-                else return isValidCertificate(issuer,isOverallValid);
+                Certificate issuer = issuerOpt.get();
+                if(certificate.getValidUntil().after(issuer.getValidUntil())) {
+                    return false;
+                }
+                else return isValidCertificate(issuer, true);
             }
+        } else {
+            isOverallValid = false;
         }
-        else isOverallValid = false;
         return isOverallValid;
+    }
+
+    @Override
+    public boolean isValidCertificate(String serialNumber) {
+        // Check if certificate exists
+        Optional<Certificate> certificateOpt = certificateRepository.findBySerialNumber(serialNumber);
+        if (certificateOpt.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("certificate.doesNotExist", null, Locale.getDefault()));
+        }
+        Certificate certificate = certificateOpt.get();
+
+        return isValidCertificate(certificate);
+    }
+
+    private boolean isValidCertificate(Certificate certificate) {
+        return isValidCertificate(certificate, true);
     }
 
     @Override
@@ -135,7 +111,7 @@ public class CertificateService implements ICertificateService {
         List<CertificateRequest> temp = certificateRequestRepository.findAll();
         List<CertificateRequestDetailsDTO> certificateRequestDetailsDTOS = new ArrayList<>();
         for (CertificateRequest r:temp) {
-            if(r.getRequester().getId() == user.getId())
+            if(Objects.equals(r.getRequester().getId(), user.getId()))
                 certificateRequestDetailsDTOS.add(CertificateRequestDetailsDTOMapper.fromRequestToDTO(r));
         }
         return certificateRequestDetailsDTOS;
@@ -160,22 +136,15 @@ public class CertificateService implements ICertificateService {
     }
 
     @Override
-    public CertificateRequest saveRequest(CertificateRequestDTO requestDTO, User requester, Certificate issuer) {
-        CertificateRequest request = CertificateRequestDTOMapper.fromDTOToRequest(requestDTO);
-        request.setDenialReason(null);
-        request.setDateRequested(DateUtil.getDateWithoutTime(new Date()));
-        request.setRequester(requester);
-        if(requester.getRoles().get(0).getName().equals("ROLE_ADMIN")) request.setRequestStatus(RequestStatus.ACCEPTED);
-        else if(requester.getEmail().equals(issuer.getOwnerEmail())) request.setRequestStatus(RequestStatus.ACCEPTED);
-        else request.setRequestStatus(RequestStatus.PENDING);
-        return certificateRequestRepository.save(request);
-    }
-
-    @Override
     public Certificate saveCertificate(CertificateRequestDTO requestDTO, User requester) {
         Certificate issuer = null;
         if(requestDTO.getIssuerSerialNumber() != null) {
-            issuer = certificateRepository.findBySerialNumber(requestDTO.getIssuerSerialNumber()).get();
+
+            Optional<Certificate> issuerOpt = certificateRepository.findBySerialNumber(requestDTO.getIssuerSerialNumber());
+            if (issuerOpt.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("certificate.doesNotExist", null, Locale.getDefault()));
+            }
+            issuer = issuerOpt.get();
         }
         SubjectData certificateSubject = certificateDataUtils.generateSubjectData(requester, requestDTO.getOrganizationData(), requestDTO.getValidUntil());
         Certificate newCertificate = new Certificate();
@@ -203,54 +172,5 @@ public class CertificateService implements ICertificateService {
                 generatePassword(requester,newCertificate).toCharArray(),
                 certificateKS);
         return certificate;
-    }
-
-    @Override
-    public CertificateRequestDetailsDTO denyRequest(Integer requestId, String reason, User denier) {
-        CertificateRequest request = validateRequestManagementAttempt(requestId, denier);
-
-        request.setRequestStatus(RequestStatus.DENIED);
-        request.setDenialReason(reason);
-        certificateRequestRepository.save(request);
-
-        return CertificateRequestDetailsDTOMapper.fromRequestToDTO(request);
-    }
-
-    @Override
-    public CertificateRequestDetailsDTO acceptRequest(Integer requestId, User accepter) {
-        CertificateRequest request = validateRequestManagementAttempt(requestId, accepter);
-
-        saveCertificate(CertificateRequestDTOMapper.fromRequestToDTO(request), request.getRequester());
-        request.setRequestStatus(RequestStatus.ACCEPTED);
-        certificateRequestRepository.save(request);
-
-        return CertificateRequestDetailsDTOMapper.fromRequestToDTO(request);
-    }
-
-    private CertificateRequest validateRequestManagementAttempt(Integer requestId, User manager) {
-        // Check if request exists
-        Optional<CertificateRequest> requestOptional = certificateRequestRepository.findById(requestId);
-        if (requestOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("request.doesNotExist", null, Locale.getDefault()));
-        }
-        CertificateRequest request = requestOptional.get();
-
-        // Check if request is pending
-        if (!request.getRequestStatus().equals(RequestStatus.PENDING)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, messageSource.getMessage("request.notPending", null, Locale.getDefault()));
-        }
-
-        // Check if issuer exists
-        Optional<Certificate> issuerOptional = certificateRepository.findBySerialNumber(request.getIssuerSerialNumber());
-        if (issuerOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("issuer.doesNotExist", null, Locale.getDefault()));
-        }
-        Certificate issuer = issuerOptional.get();
-
-        // Check if manager is the issuer certificate's owner
-        if (!issuer.getOwnerEmail().equals(manager.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, messageSource.getMessage("request.userNotIssuer", null, Locale.getDefault()));
-        }
-        return request;
     }
 }

@@ -3,14 +3,12 @@ package ftn.app.controller;
 import ftn.app.dto.CertificateRequestDTO;
 import ftn.app.dto.CertificateRequestDenialDTO;
 import ftn.app.dto.CertificateRequestDetailsDTO;
-import ftn.app.model.Certificate;
-import ftn.app.model.CertificateRequest;
 import ftn.app.model.ResponseMessage;
 import ftn.app.model.Role;
 import ftn.app.model.User;
 import ftn.app.model.enums.CertificateType;
+import ftn.app.service.CertificateRequestService;
 import ftn.app.service.CertificateService;
-import ftn.app.util.KeystoreUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,16 +25,16 @@ import java.util.Locale;
 public class CertificateController {
 
 
-    private CertificateService certificateService;
-    private MessageSource messageSource;
-    private KeystoreUtils keystoreUtils;
+    private final CertificateService certificateService;
+    private final MessageSource messageSource;
+    private final CertificateRequestService certificateRequestService;
 
     public CertificateController(CertificateService certificateService,
                                  MessageSource messageSource,
-                                 KeystoreUtils keystoreUtils) {
+                                 CertificateRequestService certificateRequestService) {
         this.certificateService = certificateService;
         this.messageSource = messageSource;
-        this.keystoreUtils = keystoreUtils;
+        this.certificateRequestService = certificateRequestService;
     }
 
     @PostMapping(value = "/request", consumes = "application/json")
@@ -46,10 +44,9 @@ public class CertificateController {
             if(!requester.getRoles().get(0).getName().equals("ROLE_ADMIN") && requestDTO.getCertificateType().equals(CertificateType.ROOT)){
                 return new ResponseEntity<>(messageSource.getMessage("user.notAuthorized", null, Locale.getDefault()), HttpStatus.UNAUTHORIZED);
             }
-            CertificateRequestDetailsDTO requestDetailsDTO = certificateService.requestCertificate(requestDTO,requester);
+            CertificateRequestDetailsDTO requestDetailsDTO = certificateRequestService.createRequest(requestDTO,requester);
             return new ResponseEntity<>(requestDetailsDTO, HttpStatus.OK);
-        }
-        catch (ResponseStatusException ex) {
+        } catch (ResponseStatusException ex) {
             return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
         }
     }
@@ -59,7 +56,7 @@ public class CertificateController {
                                                     @Valid @RequestBody CertificateRequestDenialDTO denialDTO) {
         try {
             User denier = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            CertificateRequestDetailsDTO request = certificateService.denyRequest(id, denialDTO.getDenialReason(), denier);
+            CertificateRequestDetailsDTO request = certificateRequestService.denyRequest(id, denialDTO.getDenialReason(), denier);
             return new ResponseEntity<>(request, HttpStatus.OK);
         } catch (ResponseStatusException ex) {
             return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
@@ -70,26 +67,36 @@ public class CertificateController {
     public ResponseEntity<?> acceptCertificateRequest(@PathVariable Integer id) {
         try {
             User accepter = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            CertificateRequestDetailsDTO request = certificateService.acceptRequest(id, accepter);
+            CertificateRequestDetailsDTO request = certificateRequestService.acceptRequest(id, accepter);
             return new ResponseEntity<>(request, HttpStatus.OK);
         } catch (ResponseStatusException ex) {
             return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
         }
     }
     @GetMapping(value = "/certificates")
-    public ResponseEntity<?> getCertificates(){
+    public ResponseEntity<?> getCertificates() {
         return new ResponseEntity<>(certificateService.getAllCertificates(), HttpStatus.OK);
     }
     @GetMapping(value = "/requests")
-    public ResponseEntity<?> getRequests(){
+    public ResponseEntity<?> getRequests() {
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Role role = user.getRoles().get(0);
-        if(role.getName().equals("ROLE_AUTHENTICATED")){
+        if (role.getName().equals("ROLE_AUTHENTICATED")) {
             return new ResponseEntity<>(certificateService.getUserRequests(user), HttpStatus.OK);
         } else if (role.getName().equals("ROLE_ADMIN")) {
             return new ResponseEntity<>(certificateService.getAllRequests(), HttpStatus.OK);
-        }else {
+        } else {
             return null;
+        }
+    }
+
+    @GetMapping(value = "/{id}/validate")
+    public ResponseEntity<?> validateCertificate(@PathVariable String id) {
+        try {
+            Boolean valid = certificateService.isValidCertificate(id);
+            return new ResponseEntity<>(valid, HttpStatus.OK);
+        } catch (ResponseStatusException ex) {
+            return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
         }
     }
 }
