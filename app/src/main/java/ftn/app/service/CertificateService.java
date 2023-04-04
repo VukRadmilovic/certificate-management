@@ -23,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class CertificateService implements ICertificateService {
@@ -57,9 +58,14 @@ public class CertificateService implements ICertificateService {
         if(requestDTO.getValidUntil().before(DateUtil.getDateWithoutTime(new Date()))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,messageSource.getMessage("request.dateInvalid", null, Locale.getDefault()));
         }
+        Optional<Certificate> issuerOpt;
         Certificate issuer;
         if(requestDTO.getIssuerSerialNumber() != null) {
-            issuer = certificateRepository.findBySerialNumber(requestDTO.getIssuerSerialNumber()).get();
+            issuerOpt = certificateRepository.findBySerialNumber(requestDTO.getIssuerSerialNumber());
+            if(issuerOpt.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,messageSource.getMessage("issuer.doesNotExist", null, Locale.getDefault()));
+            }
+            issuer = issuerOpt.get();
             if(requestDTO.getValidUntil().after(issuer.getValidUntil())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,messageSource.getMessage("request.dateInvalid", null, Locale.getDefault()));
             }
