@@ -1,5 +1,6 @@
 package ftn.app.dto;
 
+import ftn.app.model.OrganizationData;
 import ftn.app.model.enums.CertificateType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +17,8 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CertificateDetailsDTO {
+
+    private String serialNumber;
     @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "{format}")
     @NotBlank
     @Valid
@@ -26,4 +29,11 @@ public class CertificateDetailsDTO {
     @NotNull
     @Valid
     private Date validFrom;
+    @NotNull
+    @Valid
+    private Date validUntil;
+    @NotNull
+    @Valid
+    private OrganizationData organizationData;
+
 }

@@ -29,6 +29,9 @@ public class Certificate {
     private String issuerSerialNumber;
 
     @Column(nullable = false)
+    private String organizationData;
+
+    @Column(nullable = false)
     private boolean isValid;
 
     @Column(nullable = false)

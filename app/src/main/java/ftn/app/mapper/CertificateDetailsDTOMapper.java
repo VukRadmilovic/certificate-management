@@ -5,6 +5,7 @@ import ftn.app.dto.CertificateRequestDetailsDTO;
 import ftn.app.model.Certificate;
 import ftn.app.model.CertificateRequest;
 import ftn.app.model.enums.CertificateType;
+import ftn.app.util.OrganizationDataUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration;
 import org.modelmapper.convention.MatchingStrategies;
@@ -34,6 +35,7 @@ public class CertificateDetailsDTOMapper {
         } else if (model.getCertificateType() == CertificateType.INTERMEDIATE) {
             dto.setCertificateType("INTERMEDIATE");
         }
+        dto.setOrganizationData(OrganizationDataUtils.parseOrganizationData(model.getOrganizationData()));
         return dto; }
 
     public static CertificateRequest fromDTOToCertificate(CertificateRequestDetailsDTO dto) { return modelMapper.map(dto,CertificateRequest.class); }

@@ -2,7 +2,6 @@ package ftn.app.model;
 
 import ftn.app.model.enums.CertificateType;
 import ftn.app.model.enums.RequestStatus;
-import ftn.app.util.OrganizationDataUtils;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -57,10 +56,6 @@ public class CertificateRequest {
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         CertificateRequest certificateRequest = (CertificateRequest) o;
         return id != null && Objects.equals(id, certificateRequest.id);
-    }
-
-    public void generateOrganizationData(OrganizationData data) {
-        this.organizationData = OrganizationDataUtils.writeOrganizationData(data);
     }
 
 }

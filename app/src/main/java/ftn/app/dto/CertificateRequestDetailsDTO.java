@@ -13,6 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class CertificateRequestDetailsDTO extends CertificateRequestDTO{
 
+    private Integer id;
     private RequestStatus requestStatus;
     private Date dateRequested;
     private String denialReason;

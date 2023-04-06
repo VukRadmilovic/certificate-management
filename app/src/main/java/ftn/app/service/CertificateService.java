@@ -12,6 +12,7 @@ import ftn.app.repository.UserRepository;
 import ftn.app.service.interfaces.ICertificateService;
 import ftn.app.util.DateUtil;
 import ftn.app.util.KeystoreUtils;
+import ftn.app.util.OrganizationDataUtils;
 import ftn.app.util.certificateUtils.CertificateDataUtils;
 import ftn.app.util.certificateUtils.CertificateUtils;
 import org.springframework.context.MessageSource;
@@ -154,6 +155,7 @@ public class CertificateService implements ICertificateService {
         newCertificate.setValidFrom(certificateSubject.getStartDate());
         newCertificate.setValidUntil(certificateSubject.getEndDate());
         newCertificate.setValid(true);
+        newCertificate.setOrganizationData(OrganizationDataUtils.writeOrganizationData(requestDTO.getOrganizationData()));
         newCertificate.setOwnerEmail(requester.getEmail());
         Certificate certificate = certificateRepository.save(newCertificate);
 
