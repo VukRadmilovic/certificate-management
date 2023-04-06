@@ -18,9 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Date;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CertificateRequestService implements ICertificateRequestService {
@@ -135,5 +133,26 @@ public class CertificateRequestService implements ICertificateRequestService {
         else if(requester.getEmail().equals(issuer.getOwnerEmail())) request.setRequestStatus(RequestStatus.ACCEPTED);
         else request.setRequestStatus(RequestStatus.PENDING);
         return certificateRequestRepository.save(request);
+    }
+
+    @Override
+    public List<CertificateRequestDetailsDTO> getUserRequests(User user) {
+        List<CertificateRequest> temp = certificateRequestRepository.findAll();
+        List<CertificateRequestDetailsDTO> certificateRequestDetailsDTOS = new ArrayList<>();
+        for (CertificateRequest r:temp) {
+            if(Objects.equals(r.getRequester().getId(), user.getId()))
+                certificateRequestDetailsDTOS.add(CertificateRequestDetailsDTOMapper.fromRequestToDTO(r));
+        }
+        return certificateRequestDetailsDTOS;
+    }
+
+    @Override
+    public List<CertificateRequestDetailsDTO> getAllRequests() {
+        List<CertificateRequest> temp = certificateRequestRepository.findAll();
+        List<CertificateRequestDetailsDTO> certificateRequestDetailsDTOS = new ArrayList<>();
+        for (CertificateRequest r:temp) {
+            certificateRequestDetailsDTOS.add(CertificateRequestDetailsDTOMapper.fromRequestToDTO(r));
+        }
+        return certificateRequestDetailsDTOS;
     }
 }

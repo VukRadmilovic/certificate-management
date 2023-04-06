@@ -1,0 +1,291 @@
+{
+	"info": {
+		"_postman_id": "2cc00459-07cf-4a5b-8f1e-f7ed2c0f4371",
+		"name": "Info Security",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25076779"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"mail3@mail.com\",\r\n    \"password\": \"123456\",\r\n    \"name\": \"Mirko\",\r\n    \"surname\": \"Mirkovic\",\r\n    \"phoneNumber\": \"+38163849182\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/user/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"user",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"email\":\"mail3@mail.com\",\r\n\t\"password\":\"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/user/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request root certificate",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJpbmZvLXNlY3VyaXR5LWFwcCIsInN1YiI6Im1haWwxQG1haWwuY29tIiwiYXVkIjoid2ViIiwiaWF0IjoxNjgwNjM0MzAxLCJleHAiOjE2ODA2MzYxMDEsInJvbGUiOiJST0xFX0FETUlOIn0.LpA2i4x-bDRBoFKQ6PiIC4_pf3RCRAX7GoKax-iYOEoswC-ldh2j2v3IAgkyn6EwxE9l3I3ErL077SVQAepstA",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"certificateType\":\"ROOT\",\r\n\t\"organizationData\":\r\n\t{\r\n\t\t\"name\":\"ACS\",\r\n\t\t\"unit\":\"FTN\",\r\n\t\t\"countryCode\":\"SRB\"\r\n\t},\r\n\t\"validUntil\": \"2024-04-04\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/certificate/request",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"certificate",
+						"request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request end certificate",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJpbmZvLXNlY3VyaXR5LWFwcCIsInN1YiI6Im1haWwyQG1haWwuY29tIiwiYXVkIjoid2ViIiwiaWF0IjoxNjgwNjMwNDgwLCJleHAiOjE2ODA2MzIyODAsInJvbGUiOiJST0xFX0FVVEhFTlRJQ0FURUQifQ._ofNZKsCfdFJE6OWZ14T0T_A560aZvPNQ9_0Q4ETvf-bM8CmX85-R5vCyk1hNLFy6YC25CJUSVk4vXSoWa2Gnw",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"issuerSerialNumber\": \"2\",\r\n\t\"certificateType\":\"END\",\r\n\t\"organizationData\":\r\n\t{\r\n\t\t\"name\":\"ACS\",\r\n\t\t\"unit\":\"FTN\",\r\n\t\t\"countryCode\":\"SRB\"\r\n\t},\r\n\t\"validUntil\": \"2024-04-01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/certificate/request",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"certificate",
+						"request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deny request",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJpbmZvLXNlY3VyaXR5LWFwcCIsInN1YiI6Im1haWwxQG1haWwuY29tIiwiYXVkIjoid2ViIiwiaWF0IjoxNjgwNjM0MzAxLCJleHAiOjE2ODA2MzYxMDEsInJvbGUiOiJST0xFX0FETUlOIn0.LpA2i4x-bDRBoFKQ6PiIC4_pf3RCRAX7GoKax-iYOEoswC-ldh2j2v3IAgkyn6EwxE9l3I3ErL077SVQAepstA",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"denialReason\": \"Good reason\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/certificate/request/deny/9",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"certificate",
+						"request",
+						"deny",
+						"9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Accept request",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJpbmZvLXNlY3VyaXR5LWFwcCIsInN1YiI6Im1haWwxQG1haWwuY29tIiwiYXVkIjoid2ViIiwiaWF0IjoxNjgwNjM0MzAxLCJleHAiOjE2ODA2MzYxMDEsInJvbGUiOiJST0xFX0FETUlOIn0.LpA2i4x-bDRBoFKQ6PiIC4_pf3RCRAX7GoKax-iYOEoswC-ldh2j2v3IAgkyn6EwxE9l3I3ErL077SVQAepstA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/certificate/request/accept/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"certificate",
+						"request",
+						"accept",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validate certificate",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJpbmZvLXNlY3VyaXR5LWFwcCIsInN1YiI6Im1haWwxQG1haWwuY29tIiwiYXVkIjoid2ViIiwiaWF0IjoxNjgwODEwNjI4LCJleHAiOjE2ODA4MTI0MjgsInJvbGUiOiJST0xFX0FETUlOIn0.5wjifW0A9ZEr64V176D9s6L9TG291VhrabqjmknwVgwVJRG_TbkuJ67AwvgygVpb7W4-v6uoOv0bQFSFNi6ocA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/certificate/123456/validate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"certificate",
+						"123456",
+						"validate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all certificates",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJpbmZvLXNlY3VyaXR5LWFwcCIsInN1YiI6Im1haWwyQG1haWwuY29tIiwiYXVkIjoid2ViIiwiaWF0IjoxNjgwODEwMzUxLCJleHAiOjE2ODA4MTIxNTEsInJvbGUiOiJST0xFX0FVVEhFTlRJQ0FURUQifQ.moWJKsrRncTIat6_uodqTUMkjEgrQJsG6Gsk6EOnxJQAjCc3K6f54PX6J-BKljrmiRVXM0kJfDB0ZfTVWS8PfA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/certificate/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"certificate",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user's certificate requests",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJpbmZvLXNlY3VyaXR5LWFwcCIsInN1YiI6Im1haWwzQG1haWwuY29tIiwiYXVkIjoid2ViIiwiaWF0IjoxNjgwODExODYwLCJleHAiOjE2ODA4MTM2NjAsInJvbGUiOiJST0xFX0FVVEhFTlRJQ0FURUQifQ.vNLgiZdaPvNRaLxRV4xCafmM4700rVtx7uC3hWXE36tQSj6mglOzwDtFy00LC_SUj61Yp7A9Sbi1CO9d3AoFqw",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/certificate/requests",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"certificate",
+						"requests"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

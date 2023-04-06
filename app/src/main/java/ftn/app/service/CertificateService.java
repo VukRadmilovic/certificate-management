@@ -2,12 +2,12 @@ package ftn.app.service;
 
 import ftn.app.dto.CertificateDetailsDTO;
 import ftn.app.dto.CertificateRequestDTO;
-import ftn.app.dto.CertificateRequestDetailsDTO;
 import ftn.app.mapper.CertificateDetailsDTOMapper;
-import ftn.app.mapper.CertificateRequestDetailsDTOMapper;
-import ftn.app.model.*;
+import ftn.app.model.Certificate;
+import ftn.app.model.IssuerData;
+import ftn.app.model.SubjectData;
+import ftn.app.model.User;
 import ftn.app.repository.CertificateRepository;
-import ftn.app.repository.CertificateRequestRepository;
 import ftn.app.repository.UserRepository;
 import ftn.app.service.interfaces.ICertificateService;
 import ftn.app.util.DateUtil;
@@ -30,7 +30,6 @@ public class CertificateService implements ICertificateService {
     private final UserRepository userRepository;
     private final MessageSource messageSource;
     private final CertificateDataUtils certificateDataUtils;
-    private final CertificateRequestRepository certificateRequestRepository;
     private final CertificateUtils certificateUtils;
     private final KeystoreUtils keystoreUtils;
 
@@ -38,14 +37,12 @@ public class CertificateService implements ICertificateService {
                               UserRepository userRepository,
                               MessageSource messageSource,
                               CertificateDataUtils certificateDataUtils,
-                              CertificateRequestRepository certificateRequestRepository,
                               CertificateUtils certificateUtils,
                               KeystoreUtils keystoreUtils){
         this.certificateRepository = certificateRepository;
         this.userRepository = userRepository;
         this.messageSource = messageSource;
         this.certificateDataUtils = certificateDataUtils;
-        this.certificateRequestRepository = certificateRequestRepository;
         this.certificateUtils = certificateUtils;
         this.keystoreUtils = keystoreUtils;
     }
@@ -105,27 +102,6 @@ public class CertificateService implements ICertificateService {
             certificateDetailsDTOS.add(CertificateDetailsDTOMapper.fromCertificateToDTO(c));
         }
         return certificateDetailsDTOS;
-    }
-
-    @Override
-    public List<CertificateRequestDetailsDTO> getUserRequests(User user) {
-        List<CertificateRequest> temp = certificateRequestRepository.findAll();
-        List<CertificateRequestDetailsDTO> certificateRequestDetailsDTOS = new ArrayList<>();
-        for (CertificateRequest r:temp) {
-            if(Objects.equals(r.getRequester().getId(), user.getId()))
-                certificateRequestDetailsDTOS.add(CertificateRequestDetailsDTOMapper.fromRequestToDTO(r));
-        }
-        return certificateRequestDetailsDTOS;
-    }
-
-    @Override
-    public List<CertificateRequestDetailsDTO> getAllRequests() {
-        List<CertificateRequest> temp = certificateRequestRepository.findAll();
-        List<CertificateRequestDetailsDTO> certificateRequestDetailsDTOS = new ArrayList<>();
-        for (CertificateRequest r:temp) {
-            certificateRequestDetailsDTOS.add(CertificateRequestDetailsDTOMapper.fromRequestToDTO(r));
-        }
-        return certificateRequestDetailsDTOS;
     }
 
     private String generateAlias(User requester, Certificate certificate) {
