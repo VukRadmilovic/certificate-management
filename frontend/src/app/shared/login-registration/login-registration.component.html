@@ -1,0 +1,45 @@
+<body>
+  <div class = "header">
+    <div class= "center-vertical white-text">Certificate issuing app</div>
+  </div>
+  <br>
+  <br>
+  <br>
+  <div class="width-70 center-horizontal border height-70">
+    <mat-tab-group>
+      <mat-tab label="Login">
+        <div class="padding flex-column">
+          <br>
+          <div class="mat-headline-3">Login</div>
+          <form [formGroup]="loginForm" class="flex-column center-horizontal width-50">
+            <mat-form-field>
+              <mat-label>Email</mat-label>
+              <input type="email" matInput formControlName="email" placeholder="Ex. pat@example.com">
+              <mat-error *ngIf="loginForm.controls['email'].hasError('email') && !loginForm.controls['email'].hasError('required')">
+                Please enter a valid email address
+              </mat-error>
+              <mat-error *ngIf="loginForm.controls['email'].hasError('required')">
+                Email is <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+              <mat-label>Password</mat-label>
+              <input matInput formControlName="password" type="password">
+              <mat-error *ngIf="loginForm.controls['password'].hasError('required')">
+                Password is <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+            <br>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal">Prijava</button>
+          </form>
+        </div>
+      </mat-tab>
+      <mat-tab label="Registration">
+        <div class="padding">
+          Content 2
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</body>
