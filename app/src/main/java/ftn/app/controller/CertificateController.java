@@ -73,18 +73,19 @@ public class CertificateController {
             return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
         }
     }
-    @GetMapping(value = "/certificates")
+    @GetMapping(value = "/all")
     public ResponseEntity<?> getCertificates() {
         return new ResponseEntity<>(certificateService.getAllCertificates(), HttpStatus.OK);
     }
+
     @GetMapping(value = "/requests")
     public ResponseEntity<?> getRequests() {
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Role role = user.getRoles().get(0);
         if (role.getName().equals("ROLE_AUTHENTICATED")) {
-            return new ResponseEntity<>(certificateService.getUserRequests(user), HttpStatus.OK);
+            return new ResponseEntity<>(certificateRequestService.getUserRequests(user), HttpStatus.OK);
         } else if (role.getName().equals("ROLE_ADMIN")) {
-            return new ResponseEntity<>(certificateService.getAllRequests(), HttpStatus.OK);
+            return new ResponseEntity<>(certificateRequestService.getAllRequests(), HttpStatus.OK);
         } else {
             return null;
         }

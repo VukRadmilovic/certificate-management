@@ -19,12 +19,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -77,7 +75,7 @@ public class UserController {
             List<Role> roles = new ArrayList<>();
             roles.add(roleRepository.findByName("ROLE_AUTHENTICATED").get());
             user.setRoles(roles);
-            userService.Register(user);
+            userService.register(user);
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
         }
         catch (ResponseStatusException ex){
