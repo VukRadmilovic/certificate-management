@@ -6,12 +6,13 @@ import {RouterOutlet} from "@angular/router";
 import { LoginRegistrationComponent } from './shared/login-registration/login-registration.component';
 import {AppRoutingModule} from "./app-routing.module";
 import {InterceptorService} from "./shared/interceptor/interceptor.service";
-import {HTTP_INTERCEPTORS} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatTabsModule} from "@angular/material/tabs";
 import {MatInputModule} from "@angular/material/input";
 import {ReactiveFormsModule} from "@angular/forms";
 import {MatButtonModule} from "@angular/material/button";
+import {MatSnackBarModule} from "@angular/material/snack-bar";
 
 @NgModule({
   declarations: [
@@ -26,7 +27,9 @@ import {MatButtonModule} from "@angular/material/button";
     MatTabsModule,
     MatInputModule,
     ReactiveFormsModule,
-    MatButtonModule
+    HttpClientModule,
+    MatButtonModule,
+    MatSnackBarModule
   ],
   providers: [    {
     provide: HTTP_INTERCEPTORS,

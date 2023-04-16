@@ -31,13 +31,65 @@
               </mat-error>
             </mat-form-field>
             <br>
-            <button mat-raised-button color="primary" class="width-exact center-horizontal">Prijava</button>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="login()">Login</button>
           </form>
         </div>
       </mat-tab>
+
       <mat-tab label="Registration">
-        <div class="padding">
-          Content 2
+        <div class="padding flex-column">
+          <div class="mat-headline-3" style="margin-bottom: 40px;">Registration</div>
+          <form [formGroup]="registrationForm" class="flex-column center-horizontal width-100">
+            <div class = "flex-row">
+              <div class="width-50 flex-column padding">
+
+                <mat-form-field>
+                  <mat-label>First Name</mat-label>
+                  <input matInput formControlName="name" type="text">
+                  <mat-error *ngIf="registrationForm.controls['name'].hasError('required')">
+                    First Name is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field>
+                  <mat-label>Surname</mat-label>
+                  <input matInput formControlName="surname" type="text">
+                  <mat-error *ngIf="registrationForm.controls['surname'].hasError('required')">
+                    Surname is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field>
+                  <mat-label>Phone number</mat-label>
+                  <input matInput formControlName="phoneNumber" type="tel">
+                  <mat-error *ngIf="registrationForm.controls['phoneNumber'].hasError('required')">
+                    Phone number is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="width-50 flex-column padding vertical-align-top">
+                <mat-form-field>
+                  <mat-label>Email</mat-label>
+                  <input type="email" matInput formControlName="email" placeholder="Ex. pat@example.com">
+                  <mat-error *ngIf="registrationForm.controls['email'].hasError('email') && !registrationForm.controls['email'].hasError('required')">
+                    Please enter a valid email address
+                  </mat-error>
+                  <mat-error *ngIf="registrationForm.controls['email'].hasError('required')">
+                    Email is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+                <br>
+                <mat-form-field>
+                  <mat-label>Password</mat-label>
+                  <input matInput formControlName="password" type="password">
+                  <mat-error *ngIf="registrationForm.controls['password'].hasError('required')">
+                    Password is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+          </div>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="register()">Register</button>
+          </form>
         </div>
       </mat-tab>
     </mat-tab-group>

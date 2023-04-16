@@ -15,13 +15,11 @@ export class InterceptorService implements HttpInterceptor {
     if (req.headers.get('skip')) {
       return next.handle(req);
     }
-
-    if (accessToken && !req.url.includes('geocode')) {
+    if (accessToken) {
       const cloned = req.clone({
         setHeaders: {
           Authorization: `Bearer ${decodedItem.accessToken}`
         }
-
       });
       return next.handle(cloned);
     } else {

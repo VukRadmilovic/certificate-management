@@ -3,7 +3,6 @@ package ftn.app.controller;
 import ftn.app.dto.CertificateRequestDTO;
 import ftn.app.dto.CertificateRequestDenialDTO;
 import ftn.app.dto.CertificateRequestDetailsDTO;
-import ftn.app.model.ResponseMessage;
 import ftn.app.model.Role;
 import ftn.app.model.User;
 import ftn.app.model.enums.CertificateType;
@@ -47,7 +46,7 @@ public class CertificateController {
             CertificateRequestDetailsDTO requestDetailsDTO = certificateRequestService.createRequest(requestDTO,requester);
             return new ResponseEntity<>(requestDetailsDTO, HttpStatus.OK);
         } catch (ResponseStatusException ex) {
-            return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
+            return new ResponseEntity<>(ex.getReason(), ex.getStatus());
         }
     }
 
@@ -59,7 +58,7 @@ public class CertificateController {
             CertificateRequestDetailsDTO request = certificateRequestService.denyRequest(id, denialDTO.getDenialReason(), denier);
             return new ResponseEntity<>(request, HttpStatus.OK);
         } catch (ResponseStatusException ex) {
-            return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
+            return new ResponseEntity<>(ex.getReason(), ex.getStatus());
         }
     }
 
@@ -70,7 +69,7 @@ public class CertificateController {
             CertificateRequestDetailsDTO request = certificateRequestService.acceptRequest(id, accepter);
             return new ResponseEntity<>(request, HttpStatus.OK);
         } catch (ResponseStatusException ex) {
-            return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
+            return new ResponseEntity<>(ex.getReason(), ex.getStatus());
         }
     }
     @GetMapping(value = "/all")
@@ -97,7 +96,7 @@ public class CertificateController {
             Boolean valid = certificateService.isValidCertificate(id);
             return new ResponseEntity<>(valid, HttpStatus.OK);
         } catch (ResponseStatusException ex) {
-            return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
+            return new ResponseEntity<>(ex.getReason(), ex.getStatus());
         }
     }
 }
