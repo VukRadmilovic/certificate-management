@@ -1,0 +1,20 @@
+<div class="flex-column">
+  <h1 mat-dialog-title class="center-horizontal">Denial Reason</h1>
+  <div mat-dialog-content>
+    <form [formGroup]="reasonForm">
+      <mat-form-field appearance="fill">
+        <mat-label>Reason</mat-label>
+        <textarea matInput formControlName="denialReason"></textarea>
+        <mat-error *ngIf="reasonForm.controls['denialReason'].hasError('required')">
+          Denial reason is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+      <br>
+      <div mat-dialog-actions class="center-horizontal width-100">
+        <button mat-button (click)="close()">Close</button>
+        <button mat-button (click)="submit()" [mat-dialog-close]="data" cdkFocusInitial>Deny</button>
+      </div>
+    </form>
+  </div>
+
+</div>

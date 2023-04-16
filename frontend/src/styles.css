@@ -14,6 +14,9 @@ body {
   color: rgba(0, 0, 0, 0.6);
 }
 
+.nav-wrapper{
+  background-color: #7b1fa2;
+}
 
 .header {
   background-color: #7b1fa2;
@@ -84,4 +87,8 @@ body {
 
 .vertical-align-top {
   justify-content: start;
+}
+
+.height-50 {
+  height: 50%;
 }

@@ -17,7 +17,7 @@ export class LoginService implements CanActivate {
     if (this.userService.isLoggedIn()) {
       const role  = this.userService.getRole();
       if(role == 'ROLE_AUTHENTICATED') {
-        console.log("authenticated");
+        this.router.navigate(['user-main'])
       }
       if(role == 'ROLE_ADMIN') {
         console.log("admin");

@@ -1,0 +1,10 @@
+td {
+  word-break: break-all;
+  cursor: pointer;
+}
+table {
+  overflow: scroll;
+}
+.width-20 {
+  width: 20%;
+}

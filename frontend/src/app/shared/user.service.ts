@@ -28,6 +28,10 @@ export class UserService {
     });
   }
 
+  public logout(): void {
+    sessionStorage.removeItem('user');
+  }
+
   public register(user : User) : Observable<ArrayBuffer> {
     const options: any = {
       responseType: 'text',
