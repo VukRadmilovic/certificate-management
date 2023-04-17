@@ -1,6 +1,7 @@
+<app-admin-navigation></app-admin-navigation>
 <br>
 <br>
-<div class="mat-headline-3  flex-row">Sent Requests</div>
+<div class="mat-headline-3  flex-row">All Requests</div>
 <table
   mat-table
   [dataSource]="dataSource"
@@ -49,20 +50,11 @@
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-  <tr mat-row (click)="setButtonsStatus(element)" *matRowDef="let element; columns: displayedColumns"></tr>
+  <tr mat-row *matRowDef="let element; columns: displayedColumns"></tr>
 </table>
 <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons> </mat-paginator>
 <br>
 <div class="flex-row">
-    <button mat-raised-button style="margin-right: 2em;"
-            color="primary"
-            class="width-exact"
-            [disabled]="!enableStatusChange"
-            (click)="acceptRequest()">Accept</button>
-    <button mat-raised-button color="primary"
-            style="margin-right: 2em;"
-            class="width-exact"
-            (click)="denyRequest()"
-            [disabled]="!enableStatusChange">Deny</button>
+  <button mat-raised-button color="primary" class="width-exact" (click)="newRequest()">New request</button>
 </div>
 

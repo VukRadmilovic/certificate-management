@@ -20,7 +20,7 @@ export class LoginService implements CanActivate {
         this.router.navigate(['user-main'])
       }
       if(role == 'ROLE_ADMIN') {
-        console.log("admin");
+        this.router.navigate(['admin-main'])
       }
     }
     return false;

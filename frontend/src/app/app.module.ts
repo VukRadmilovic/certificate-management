@@ -28,6 +28,11 @@ import {MatRadioModule} from "@angular/material/radio";
 import {MatSelectModule} from "@angular/material/select";
 import {MatDatepickerModule} from "@angular/material/datepicker";
 import {MatNativeDateModule} from "@angular/material/core";
+import { AdminNavigationComponent } from './admin/admin-navigation/admin-navigation.component';
+import { AllRequestsComponent } from './admin/all-requests/all-requests.component';
+import { AdminMainComponent } from './admin/admin-main/admin-main.component';
+import { AdminReceivedRequestsComponent } from './admin/admin-received-requests/admin-received-requests.component';
+import { UserReceivedRequestsComponent } from './user/user-received-requests/user-received-requests.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +43,12 @@ import {MatNativeDateModule} from "@angular/material/core";
     UserRequestsComponent,
     RequestDenyReasonDialogComponent,
     ReceivedRequestsComponent,
-    NewRequestFormComponent
+    NewRequestFormComponent,
+    AdminNavigationComponent,
+    AllRequestsComponent,
+    AdminMainComponent,
+    AdminReceivedRequestsComponent,
+    UserReceivedRequestsComponent
   ],
   imports: [
     BrowserModule,
