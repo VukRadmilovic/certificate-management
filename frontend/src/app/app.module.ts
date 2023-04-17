@@ -33,6 +33,7 @@ import { AllRequestsComponent } from './admin/all-requests/all-requests.componen
 import { AdminMainComponent } from './admin/admin-main/admin-main.component';
 import { AdminReceivedRequestsComponent } from './admin/admin-received-requests/admin-received-requests.component';
 import { UserReceivedRequestsComponent } from './user/user-received-requests/user-received-requests.component';
+import { AdminNewRequestComponent } from './admin/admin-new-request/admin-new-request.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { UserReceivedRequestsComponent } from './user/user-received-requests/use
     AllRequestsComponent,
     AdminMainComponent,
     AdminReceivedRequestsComponent,
-    UserReceivedRequestsComponent
+    UserReceivedRequestsComponent,
+    AdminNewRequestComponent
   ],
   imports: [
     BrowserModule,

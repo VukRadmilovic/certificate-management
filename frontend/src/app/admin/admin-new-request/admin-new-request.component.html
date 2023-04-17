@@ -1,0 +1,124 @@
+<body>
+<app-user-navigation></app-user-navigation>
+<div class="padding width-100">
+  <br>
+  <div class="mat-headline-3 center-horizontal">New Request</div>
+
+  <form [formGroup]="requestForm" class="flex-column center-horizontal">
+    <table
+      mat-table
+      [dataSource]="dataSource"
+      class="mat-elevation-z8 height-40"
+      matSort>
+
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef> Select issuer</th>
+        <td mat-cell *matCellDef="let row">
+          <mat-radio-button [checked]="selectedCertificate == row" (click)="changeSelected(row)"></mat-radio-button>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="serialNumber">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Serial number</th>
+        <td mat-cell *matCellDef="let element">{{ element.serialNumber }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="certificateType">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Certificate Type</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.certificateType }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="organizationData">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Organization</th>
+        <td class = "width-20" mat-cell *matCellDef="let element">{{ element.organizationData.name + ', ' + element.organizationData.unit + ', ' + element.organizationData.countryCode }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="validFrom">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Valid from</th>
+        <td mat-cell *matCellDef="let element">{{ element.validFrom | date:'yyyy-MM-dd' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="validUntil">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Valid (To)</th>
+        <td mat-cell *matCellDef="let element">{{ element.validUntil | date:'yyyy-MM-dd' }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let element; columns: displayedColumns"></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons> </mat-paginator>
+    <mat-error *ngIf="requestForm.controls['issuer'].hasError('required')">
+      Issuer is <strong>required</strong>
+    </mat-error>
+    <br>
+    <div class="flex-row">
+      <div class="width-50 padding">
+        <mat-form-field appearance="fill" class="width-100">
+          <mat-label>Certificate Type</mat-label>
+          <mat-select formControlName="certificateType" (selectionChange)="checkType($event.value)">
+            <mat-option *ngFor="let type of types" [value]="type">
+              {{type}}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="requestForm.controls['certificateType'].hasError('required')">
+            Certificate type is <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="width-50 padding">
+        <mat-form-field appearance="fill" class="width-100" >
+          <mat-label>Valid until</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="validUntil" [min]="minDate" [max]="maxDate">
+          <mat-hint>MM/DD/YYYY</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="requestForm.controls['validUntil'].hasError('required')">
+            Valid until is <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="flex-row">
+      <div class="width-40 padding">
+        <mat-form-field class="width-100">
+          <mat-label>Organization Name</mat-label>
+          <input matInput formControlName="orgName" type="text">
+          <mat-error *ngIf="requestForm.controls['orgName'].hasError('required')">
+            Organization name is <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="width-40 padding">
+        <mat-form-field class="width-100">
+          <mat-label>Organization Unit</mat-label>
+          <input matInput formControlName="orgUnit" type="text">
+          <mat-error *ngIf="requestForm.controls['orgUnit'].hasError('required')">
+            Organization unit is <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="width-20 padding">
+        <mat-form-field class="width-100">
+          <mat-label>Country Code</mat-label>
+          <input  matInput formControlName="countryCode" type="text">
+          <mat-error *ngIf="requestForm.controls['countryCode'].hasError('required')">
+            Country Code is <strong>required</strong>
+          </mat-error>
+          <mat-error *ngIf="!requestForm.controls['countryCode'].hasError('required') &&
+             (requestForm.controls['countryCode'].hasError('minlength') ||
+              requestForm.controls['countryCode'].hasError('maxlength'))">
+            Country Code is a <strong>3 letter code</strong>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <br>
+    <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="createRequest()">Create Request</button>
+  </form>
+</div>
+</body>
+

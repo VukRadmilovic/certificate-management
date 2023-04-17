@@ -46,6 +46,6 @@ export class AllRequestsComponent implements AfterViewInit{
     });
   }
   public newRequest() : void {
-    this.router.navigate(['new-request']);
+    this.router.navigate(['admin-new-request']);
   }
 }
