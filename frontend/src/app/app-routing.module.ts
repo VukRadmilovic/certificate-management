@@ -5,12 +5,14 @@ import {LoginService} from "./shared/login-guard/login.service";
 import {UserMainComponent} from "./user/user-main/user-main.component";
 import {UserRequestsComponent} from "./user/user-requests/user-requests.component";
 import {ReceivedRequestsComponent} from "./user/received-requests/received-requests.component";
+import {NewRequestFormComponent} from "./user/new-request-form/new-request-form.component";
 
 const routes: Routes = [
   {path: 'index', component: LoginRegistrationComponent},
   {path:'user-main', component:UserMainComponent},
   {path:'user-requests', component:UserRequestsComponent},
   {path:'user-received-requests', component:ReceivedRequestsComponent},
+  {path:'new-request', component:NewRequestFormComponent},
   {
     path: 'login',
     component: LoginRegistrationComponent,

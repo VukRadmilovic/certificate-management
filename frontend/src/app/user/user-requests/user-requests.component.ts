@@ -4,6 +4,7 @@ import {CertificateRequestDetails} from "../../shared/model/CertificateRequestDe
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {UserRequestsService} from "../services/user-requests.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-user-requests',
@@ -15,7 +16,7 @@ export class UserRequestsComponent implements OnInit {
   dataSource!: MatTableDataSource<CertificateRequestDetails>;
   requests: CertificateRequestDetails[] = [];
 
-  constructor(private userRequestsService: UserRequestsService) {}
+  constructor(private userRequestsService: UserRequestsService, private router: Router) {}
 
   @ViewChild(MatPaginator) paginator!: any;
   @ViewChild(MatSort) sort!: any;
@@ -34,6 +35,10 @@ export class UserRequestsComponent implements OnInit {
       };
       this.dataSource.sort = this.sort;
     });
+  }
+
+  public newRequest() : void {
+    this.router.navigate(['new-request']);
   }
 
 }

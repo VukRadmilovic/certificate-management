@@ -10,7 +10,7 @@ import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatTabsModule} from "@angular/material/tabs";
 import {MatInputModule} from "@angular/material/input";
-import {ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatButtonModule} from "@angular/material/button";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import { UserNavigationComponent } from './user/user-navigation/user-navigation.component';
@@ -23,6 +23,11 @@ import { RequestDenyReasonDialogComponent } from './user/request-deny-reason-dia
 import {MatDialogModule} from "@angular/material/dialog";
 import { ReceivedRequestsComponent } from './user/received-requests/received-requests.component';
 import {MatSortModule} from "@angular/material/sort";
+import { NewRequestFormComponent } from './user/new-request-form/new-request-form.component';
+import {MatRadioModule} from "@angular/material/radio";
+import {MatSelectModule} from "@angular/material/select";
+import {MatDatepickerModule} from "@angular/material/datepicker";
+import {MatNativeDateModule} from "@angular/material/core";
 
 @NgModule({
   declarations: [
@@ -32,24 +37,30 @@ import {MatSortModule} from "@angular/material/sort";
     UserMainComponent,
     UserRequestsComponent,
     RequestDenyReasonDialogComponent,
-    ReceivedRequestsComponent
+    ReceivedRequestsComponent,
+    NewRequestFormComponent
   ],
-    imports: [
-        BrowserModule,
-        RouterOutlet,
-        AppRoutingModule,
-        BrowserAnimationsModule,
-        MatTabsModule,
-        MatInputModule,
-        ReactiveFormsModule,
-        HttpClientModule,
-        MatButtonModule,
-        MatSnackBarModule,
-        MatTableModule,
-        MatPaginatorModule,
-        MatDialogModule,
-        MatSortModule,
-    ],
+  imports: [
+    BrowserModule,
+    RouterOutlet,
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    MatTabsModule,
+    MatInputModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    MatButtonModule,
+    MatSnackBarModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatDialogModule,
+    MatSortModule,
+    MatRadioModule,
+    FormsModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule
+  ],
   providers: [    {
     provide: HTTP_INTERCEPTORS,
     useClass: InterceptorService,

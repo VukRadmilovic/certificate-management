@@ -7,6 +7,7 @@ import ftn.app.model.Certificate;
 import ftn.app.model.IssuerData;
 import ftn.app.model.SubjectData;
 import ftn.app.model.User;
+import ftn.app.model.enums.CertificateType;
 import ftn.app.repository.CertificateRepository;
 import ftn.app.repository.UserRepository;
 import ftn.app.service.interfaces.ICertificateService;
@@ -99,6 +100,17 @@ public class CertificateService implements ICertificateService {
         List<Certificate> temp = certificateRepository.findAll();
         List<CertificateDetailsDTO> certificateDetailsDTOS = new ArrayList<>();
         for (Certificate c: temp) {
+            certificateDetailsDTOS.add(CertificateDetailsDTOMapper.fromCertificateToDTO(c));
+        }
+        return certificateDetailsDTOS;
+    }
+
+    @Override
+    public List<CertificateDetailsDTO> getEligibleCertificatesForIssuing() {
+        List<Certificate> temp = certificateRepository.findAll();
+        List<CertificateDetailsDTO> certificateDetailsDTOS = new ArrayList<>();
+        for (Certificate c: temp) {
+            if(!this.isValidCertificate(c,true) || c.getCertificateType() == CertificateType.END) continue;
             certificateDetailsDTOS.add(CertificateDetailsDTOMapper.fromCertificateToDTO(c));
         }
         return certificateDetailsDTOS;

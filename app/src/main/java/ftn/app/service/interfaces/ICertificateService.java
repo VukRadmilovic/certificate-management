@@ -13,5 +13,6 @@ public interface ICertificateService {
     Certificate saveCertificate(CertificateRequestDTO requestDTO, User requester);
     boolean isValidCertificate(Certificate certificate, boolean isOverallValid);
     List<CertificateDetailsDTO> getAllCertificates();
+    List<CertificateDetailsDTO> getEligibleCertificatesForIssuing();
     boolean isValidCertificate(String serialNumber);
 }

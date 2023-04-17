@@ -1,0 +1,5 @@
+input[type=text]:not(.browser-default) {
+  border-bottom: none;
+  margin-bottom: 0;
+  height: 2em;
+}
