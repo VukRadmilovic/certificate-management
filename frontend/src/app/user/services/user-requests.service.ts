@@ -16,7 +16,15 @@ export class UserRequestsService {
     return this.http.get<CertificateRequestDetails[]>(environment.apiURL + 'certificate/requests');
   }
 
+  public getReceived() : Observable<CertificateRequestDetails[]> {
+    return this.http.get<CertificateRequestDetails[]>(environment.apiURL + 'certificate/requests/received');
+  }
+
   public denyRequest(denial : DenialReason, id: string) : Observable<CertificateRequestDetails> {
     return this.http.put<CertificateRequestDetails>(environment.apiURL + "certificate/request/deny/" + id,denial);
+  }
+
+  public acceptRequest( id: string) : Observable<CertificateRequestDetails> {
+    return this.http.put<CertificateRequestDetails>(environment.apiURL + "certificate/request/accept/" + id,null);
   }
 }

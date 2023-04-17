@@ -77,6 +77,12 @@ public class CertificateController {
         return new ResponseEntity<>(certificateService.getAllCertificates(), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/requests/received")
+    public ResponseEntity<?> getReceivedRequests() {
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return new ResponseEntity<>(certificateRequestService.getReceivedRequests(user), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/requests")
     public ResponseEntity<?> getRequests() {
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();

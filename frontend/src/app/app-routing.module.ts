@@ -4,11 +4,13 @@ import {LoginRegistrationComponent} from "./shared/login-registration/login-regi
 import {LoginService} from "./shared/login-guard/login.service";
 import {UserMainComponent} from "./user/user-main/user-main.component";
 import {UserRequestsComponent} from "./user/user-requests/user-requests.component";
+import {ReceivedRequestsComponent} from "./user/received-requests/received-requests.component";
 
 const routes: Routes = [
   {path: 'index', component: LoginRegistrationComponent},
   {path:'user-main', component:UserMainComponent},
   {path:'user-requests', component:UserRequestsComponent},
+  {path:'user-received-requests', component:ReceivedRequestsComponent},
   {
     path: 'login',
     component: LoginRegistrationComponent,

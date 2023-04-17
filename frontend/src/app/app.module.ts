@@ -21,6 +21,8 @@ import {MatPaginatorModule} from "@angular/material/paginator";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import { RequestDenyReasonDialogComponent } from './user/request-deny-reason-dialog/request-deny-reason-dialog.component';
 import {MatDialogModule} from "@angular/material/dialog";
+import { ReceivedRequestsComponent } from './user/received-requests/received-requests.component';
+import {MatSortModule} from "@angular/material/sort";
 
 @NgModule({
   declarations: [
@@ -29,23 +31,25 @@ import {MatDialogModule} from "@angular/material/dialog";
     UserNavigationComponent,
     UserMainComponent,
     UserRequestsComponent,
-    RequestDenyReasonDialogComponent
+    RequestDenyReasonDialogComponent,
+    ReceivedRequestsComponent
   ],
-  imports: [
-    BrowserModule,
-    RouterOutlet,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    MatTabsModule,
-    MatInputModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    MatButtonModule,
-    MatSnackBarModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatDialogModule,
-  ],
+    imports: [
+        BrowserModule,
+        RouterOutlet,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        MatTabsModule,
+        MatInputModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        MatButtonModule,
+        MatSnackBarModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatDialogModule,
+        MatSortModule,
+    ],
   providers: [    {
     provide: HTTP_INTERCEPTORS,
     useClass: InterceptorService,

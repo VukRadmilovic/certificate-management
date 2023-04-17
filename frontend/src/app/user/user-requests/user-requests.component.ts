@@ -4,11 +4,6 @@ import {CertificateRequestDetails} from "../../shared/model/CertificateRequestDe
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {UserRequestsService} from "../services/user-requests.service";
-import {RequestStatus} from "../../shared/model/enums/RequestStatus";
-import {MatDialog} from "@angular/material/dialog";
-import {RequestDenyReasonDialogComponent} from "../request-deny-reason-dialog/request-deny-reason-dialog.component";
-import {DenialReason} from "../../shared/model/DenialReason";
-import {NotificationsService} from "../../shared/notifications.service";
 
 @Component({
   selector: 'app-user-requests',
@@ -16,18 +11,11 @@ import {NotificationsService} from "../../shared/notifications.service";
   styleUrls: ['./user-requests.component.css']
 })
 export class UserRequestsComponent implements OnInit {
-  displayedColumns: string[] = ['Issuer SN', 'Certificate Type', 'Organization', 'Date Requested', 'Valid (To)' , 'Status', 'Denial Reason'];
+  displayedColumns: string[] = ['issuerSerialNumber', 'certificateType', 'organizationData', 'dateRequested', 'validUntil' , 'requestStatus', 'denialReason'];
   dataSource!: MatTableDataSource<CertificateRequestDetails>;
   requests: CertificateRequestDetails[] = [];
-  enableStatusChange: boolean = false;
-  selectedRequest!: CertificateRequestDetails;
-  denialReason: DenialReason = {
-    denialReason:''
-  };
 
-  constructor(private userRequestsService: UserRequestsService,
-              private notificationService: NotificationsService,
-              public denyReasonDialog: MatDialog) {}
+  constructor(private userRequestsService: UserRequestsService) {}
 
   @ViewChild(MatPaginator) paginator!: any;
   @ViewChild(MatSort) sort!: any;
@@ -37,39 +25,16 @@ export class UserRequestsComponent implements OnInit {
       this.requests = res;
       this.dataSource = new MatTableDataSource<CertificateRequestDetails>(this.requests);
       this.dataSource.paginator = this.paginator;
+      this.dataSource.sortingDataAccessor = (item, property) => {
+        switch(property) {
+          case 'organizationData': return item.organizationData.name + ', ' + item.organizationData.unit + ', ' + item.organizationData.countryCode
+          default: // @ts-ignore
+            return item[property];
+        }
+      };
       this.dataSource.sort = this.sort;
     });
   }
-  public setButtonsStatus(request : CertificateRequestDetails) : void {
-    if(request.requestStatus != RequestStatus.PENDING)
-    {
-      this.enableStatusChange = false;
-      return;
-    }
-    this.selectedRequest = request;
-    this.enableStatusChange = true;
-  }
 
-  public acceptRequest() : void {
-    console.log("you can accept");
-  }
-
-  public denyRequest() : void {
-    const dialogRef = this.denyReasonDialog.open(RequestDenyReasonDialogComponent, {
-      data: this.denialReason,
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(result)
-      this.denialReason = result;
-      this.userRequestsService.denyRequest(this.denialReason,this.selectedRequest.id.toString()).subscribe(
-        result => {
-          this.selectedRequest.requestStatus = RequestStatus.DENIED;
-          this.selectedRequest.denialReason = this.denialReason.denialReason;
-          this.notificationService.createNotification('Request successfully denied!');
-        }
-      );
-    });
-  }
 }
 

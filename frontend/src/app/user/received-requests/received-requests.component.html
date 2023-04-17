@@ -19,6 +19,11 @@
     </td>
   </ng-container>
 
+  <ng-container matColumnDef="requester.fullName">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Requester</th>
+    <td mat-cell *matCellDef="let element">{{ element.requester.fullName}}</td>
+  </ng-container>
+
   <ng-container matColumnDef="organizationData">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Organization</th>
     <td class = "width-20" mat-cell *matCellDef="let element">{{ element.organizationData.name + ', ' + element.organizationData.unit + ', ' + element.organizationData.countryCode }}</td>
@@ -45,10 +50,20 @@
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-  <tr mat-row *matRowDef="let element; columns: displayedColumns"></tr>
+  <tr mat-row (click)="setButtonsStatus(element)" *matRowDef="let element; columns: displayedColumns"></tr>
 </table>
 <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons> </mat-paginator>
 <br>
 <div class="flex-row">
-  <button mat-raised-button color="primary" class="width-exact">New request</button>
+    <button mat-raised-button style="margin-right: 2em;"
+            color="primary"
+            class="width-exact"
+            [disabled]="!enableStatusChange"
+            (click)="acceptRequest()">Accept</button>
+    <button mat-raised-button color="primary"
+            style="margin-right: 2em;"
+            class="width-exact"
+            (click)="denyRequest()"
+            [disabled]="!enableStatusChange">Deny</button>
 </div>
+
