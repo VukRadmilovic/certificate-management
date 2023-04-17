@@ -116,24 +116,6 @@
           </mat-form-field>
         </div>
       </div>
-     <!-- <mat-form-field>
-        <mat-label>Email</mat-label>
-        <input type="email" matInput formControlName="email" placeholder="Ex. pat@example.com">
-        <mat-error *ngIf="requestForm.controls['email'].hasError('email') && !requestForm.controls['email'].hasError('required')">
-          Please enter a valid email address
-        </mat-error>
-        <mat-error *ngIf="requestForm.controls['email'].hasError('required')">
-          Email is <strong>required</strong>
-        </mat-error>
-      </mat-form-field>
-      <br>
-      <mat-form-field>
-        <mat-label>Password</mat-label>
-        <input matInput formControlName="password" type="password">
-        <mat-error *ngIf="requestForm.controls['password'].hasError('required')">
-          Password is <strong>required</strong>
-        </mat-error>
-      </mat-form-field> -->
       <br>
       <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="createRequest()">Create Request</button>
     </form>

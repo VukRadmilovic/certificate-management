@@ -4,6 +4,7 @@ import {Observable} from "rxjs";
 import {CertificateRequestDetails} from "../../shared/model/CertificateRequestDetails";
 import {environment} from "../../shared/environments/environment";
 import {DenialReason} from "../../shared/model/DenialReason";
+import {CertificateRequest} from "../../shared/model/CertificateRequest";
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,11 @@ export class UserRequestsService {
     return this.http.put<CertificateRequestDetails>(environment.apiURL + "certificate/request/deny/" + id,denial);
   }
 
-  public acceptRequest( id: string) : Observable<CertificateRequestDetails> {
+  public acceptRequest(id: string) : Observable<CertificateRequestDetails> {
     return this.http.put<CertificateRequestDetails>(environment.apiURL + "certificate/request/accept/" + id,null);
+  }
+
+  public sendRequest(request : CertificateRequest) : Observable<Object> {
+    return this.http.post(environment.apiURL + "certificate/request",request);
   }
 }

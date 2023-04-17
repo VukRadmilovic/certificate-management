@@ -6,6 +6,11 @@ import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {UserCertificatesService} from "../services/user-certificates.service";
 import {UserRequestsService} from "../services/user-requests.service";
+import {CertificateRequest} from "../../shared/model/CertificateRequest";
+import {CertificateType} from "../../shared/model/enums/CertificateType";
+import {NotificationsService} from "../../shared/notifications.service";
+import {Router} from "@angular/router";
+import {timer} from "rxjs";
 
 @Component({
   selector: 'app-new-request-form',
@@ -22,7 +27,9 @@ export class NewRequestFormComponent implements AfterViewInit {
   maxDate = new Date();
 
   constructor(private userCertificateService: UserCertificatesService,
-              private userRequestsService: UserRequestsService) {}
+              private userRequestsService: UserRequestsService,
+              private notificationService: NotificationsService,
+              private router: Router) {}
   @ViewChild(MatPaginator) paginator!: any;
   @ViewChild(MatSort) sort!: any;
   requestForm = new FormGroup({
@@ -55,6 +62,21 @@ export class NewRequestFormComponent implements AfterViewInit {
   }
 
   public createRequest() : void {
+    if(this.requestForm.valid) {
+      const request : CertificateRequest =  {
+        issuerSerialNumber : this.selectedCertificate.serialNumber,
+        certificateType: CertificateType[<string>this.requestForm.controls['certificateType'].value as CertificateType],
+        validUntil: new Date(<string>this.requestForm.controls['validUntil'].value),
+        organizationData : {
+          name : <string>this.requestForm.controls['orgName'].value,
+          unit : <string>this.requestForm.controls['orgUnit'].value,
+          countryCode: <string>this.requestForm.controls['countryCode'].value?.toUpperCase()
+        }
+      }
+      this.userRequestsService.sendRequest(request).subscribe();
+      this.notificationService.createNotification("Request successfully sent!");
+      timer(1000).subscribe(x => { this.router.navigate(['user-requests']) })
+    }
   }
 
   public changeSelected(row : CertificateDetails) : void {
