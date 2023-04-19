@@ -6,5 +6,7 @@ export interface CertificateDetails {
   certificateType: string;
   validFrom: Date;
   validUntil: Date;
+  isValid: boolean;
+  withdrawingReason: string;
   organizationData: OrganizationData;
 }

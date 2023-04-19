@@ -3,6 +3,7 @@ package ftn.app.controller;
 import ftn.app.dto.CertificateRequestDTO;
 import ftn.app.dto.CertificateRequestDenialDTO;
 import ftn.app.dto.CertificateRequestDetailsDTO;
+import ftn.app.dto.WithdrawingReasonDTO;
 import ftn.app.model.Role;
 import ftn.app.model.User;
 import ftn.app.model.enums.CertificateType;
@@ -116,16 +117,14 @@ public class CertificateController {
      * @param id - serijski broj sertifikata
      * @return sertifikat koji je povucen
      */
-    @PutMapping(value = "{id}/withdraw")
-    public ResponseEntity<?> withdrawCertificate(@PathVariable String id) {
+    @PutMapping(value = "/{id}/withdraw")
+    public ResponseEntity<?> withdrawCertificate(@PathVariable String id, @Valid @RequestBody WithdrawingReasonDTO reason) {
         try{
             User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            return new ResponseEntity<>(certificateService.withdraw(user,id), HttpStatus.OK);
+            return new ResponseEntity<>(certificateService.withdraw(user,id,reason), HttpStatus.OK);
         }
         catch(ResponseStatusException ex) {
             return new ResponseEntity<>(ex.getReason(),ex.getStatus());
         }
-
-
     }
 }

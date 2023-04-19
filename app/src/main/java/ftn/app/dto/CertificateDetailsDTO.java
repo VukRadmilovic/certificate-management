@@ -35,6 +35,9 @@ public class CertificateDetailsDTO {
 
     @NotNull
     private boolean isValid;
+
+    @NotBlank
+    private String withdrawingReason;
     @NotNull
     @Valid
     private OrganizationData organizationData;

@@ -2,6 +2,7 @@ package ftn.app.service;
 
 import ftn.app.dto.CertificateDetailsDTO;
 import ftn.app.dto.CertificateRequestDTO;
+import ftn.app.dto.WithdrawingReasonDTO;
 import ftn.app.mapper.CertificateDetailsDTOMapper;
 import ftn.app.model.*;
 import ftn.app.model.enums.CertificateType;
@@ -94,16 +95,21 @@ public class CertificateService implements ICertificateService {
     }
 
     @Override
-    public Certificate withdraw(User user, String certificateSerialNumber) {
+    public Certificate withdraw(User user, String certificateSerialNumber, WithdrawingReasonDTO reason) {
         Optional<Certificate> certificateOpt = certificateRepository.findBySerialNumber(certificateSerialNumber);
         if(certificateOpt.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("certificate.doesNotExist", null, Locale.getDefault()));
         }
         Certificate certificate = certificateOpt.get();
+        if(!certificate.getOwnerEmail().equals(user.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, messageSource.getMessage("certificate.userNotOwner", null, Locale.getDefault()));
+        }
         if(!certificate.isValid()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, messageSource.getMessage("certificate.alreadyWithdrawn", null, Locale.getDefault()));
         }
         withdrawCertificateTree(certificate);
+        certificate.setWithdrawingReason(reason.getReason());
+        certificateRepository.save(certificate);
         return certificate;
     }
 
