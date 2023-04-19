@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {RequestDenyReasonDialogComponent} from "../request-deny-reason-dialog/request-deny-reason-dialog.component";
 import {RequestStatus} from "../../shared/model/enums/RequestStatus";
 import {NotificationsService} from "../../shared/notifications.service";
@@ -77,7 +77,7 @@ export class ReceivedRequestsComponent implements AfterViewInit{
   }
 
   public setButtonsStatus(request : CertificateRequestDetails) : void {
-    if(request.requestStatus != RequestStatus.PENDING)
+    if(request.requestStatus != RequestStatus.PENDING && request.requestStatus != RequestStatus.WITHDRAWN)
     {
       this.enableStatusChange = false;
       return;

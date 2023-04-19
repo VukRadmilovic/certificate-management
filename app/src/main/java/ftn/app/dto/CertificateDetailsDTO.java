@@ -32,6 +32,9 @@ public class CertificateDetailsDTO {
     @NotNull
     @Valid
     private Date validUntil;
+
+    @NotNull
+    private boolean isValid;
     @NotNull
     @Valid
     private OrganizationData organizationData;

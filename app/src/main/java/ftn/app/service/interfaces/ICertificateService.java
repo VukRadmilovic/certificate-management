@@ -15,4 +15,5 @@ public interface ICertificateService {
     List<CertificateDetailsDTO> getAllCertificates();
     List<CertificateDetailsDTO> getEligibleCertificatesForIssuing();
     boolean isValidCertificate(String serialNumber);
+    Certificate withdraw(User user, String certificateSerialNumber);
 }

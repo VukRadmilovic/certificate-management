@@ -3,12 +3,11 @@ package ftn.app.service;
 import ftn.app.dto.CertificateDetailsDTO;
 import ftn.app.dto.CertificateRequestDTO;
 import ftn.app.mapper.CertificateDetailsDTOMapper;
-import ftn.app.model.Certificate;
-import ftn.app.model.IssuerData;
-import ftn.app.model.SubjectData;
-import ftn.app.model.User;
+import ftn.app.model.*;
 import ftn.app.model.enums.CertificateType;
+import ftn.app.model.enums.RequestStatus;
 import ftn.app.repository.CertificateRepository;
+import ftn.app.repository.CertificateRequestRepository;
 import ftn.app.repository.UserRepository;
 import ftn.app.service.interfaces.ICertificateService;
 import ftn.app.util.DateUtil;
@@ -28,6 +27,7 @@ import java.util.*;
 public class CertificateService implements ICertificateService {
 
     private final CertificateRepository certificateRepository;
+    private final CertificateRequestRepository certificateRequestRepository;
     private final UserRepository userRepository;
     private final MessageSource messageSource;
     private final CertificateDataUtils certificateDataUtils;
@@ -35,12 +35,14 @@ public class CertificateService implements ICertificateService {
     private final KeystoreUtils keystoreUtils;
 
     public CertificateService(CertificateRepository certificateRepository,
+                              CertificateRequestRepository certificateRequestRepository,
                               UserRepository userRepository,
                               MessageSource messageSource,
                               CertificateDataUtils certificateDataUtils,
                               CertificateUtils certificateUtils,
                               KeystoreUtils keystoreUtils){
         this.certificateRepository = certificateRepository;
+        this.certificateRequestRepository = certificateRequestRepository;
         this.userRepository = userRepository;
         this.messageSource = messageSource;
         this.certificateDataUtils = certificateDataUtils;
@@ -89,6 +91,36 @@ public class CertificateService implements ICertificateService {
         Certificate certificate = certificateOpt.get();
 
         return isValidCertificate(certificate);
+    }
+
+    @Override
+    public Certificate withdraw(User user, String certificateSerialNumber) {
+        Optional<Certificate> certificateOpt = certificateRepository.findBySerialNumber(certificateSerialNumber);
+        if(certificateOpt.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("certificate.doesNotExist", null, Locale.getDefault()));
+        }
+        Certificate certificate = certificateOpt.get();
+        if(!certificate.isValid()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, messageSource.getMessage("certificate.alreadyWithdrawn", null, Locale.getDefault()));
+        }
+        withdrawCertificateTree(certificate);
+        return certificate;
+    }
+
+    private void withdrawCertificateTree(Certificate root) {
+
+        root.setValid(false);
+        certificateRepository.save(root);
+        List<CertificateRequest> relatedRequests = certificateRequestRepository.findByIssuerSerialNumberAndRequestStatusEquals(root.getSerialNumber(),RequestStatus.PENDING);
+        for(CertificateRequest request : relatedRequests) {
+            request.setRequestStatus(RequestStatus.WITHDRAWN);
+            certificateRequestRepository.save(request);
+        }
+        List<Certificate> children = certificateRepository.findByIssuerSerialNumber(root.getSerialNumber());
+        if(children.size() == 0)  return;
+        for(Certificate child : children) {
+            withdrawCertificateTree(child);
+        }
     }
 
     private boolean isValidCertificate(Certificate certificate) {

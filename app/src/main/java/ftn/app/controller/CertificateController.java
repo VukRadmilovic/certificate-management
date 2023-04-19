@@ -110,4 +110,22 @@ public class CertificateController {
             return new ResponseEntity<>(ex.getReason(), ex.getStatus());
         }
     }
+
+    /**
+     * 
+     * @param id - serijski broj sertifikata
+     * @return sertifikat koji je povucen
+     */
+    @PutMapping(value = "{id}/withdraw")
+    public ResponseEntity<?> withdrawCertificate(@PathVariable String id) {
+        try{
+            User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return new ResponseEntity<>(certificateService.withdraw(user,id), HttpStatus.OK);
+        }
+        catch(ResponseStatusException ex) {
+            return new ResponseEntity<>(ex.getReason(),ex.getStatus());
+        }
+
+
+    }
 }
