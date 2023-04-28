@@ -17,10 +17,14 @@ import ftn.app.util.OrganizationDataUtils;
 import ftn.app.util.certificateUtils.CertificateDataUtils;
 import ftn.app.util.certificateUtils.CertificateUtils;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
@@ -152,6 +156,28 @@ public class CertificateService implements ICertificateService {
             certificateDetailsDTOS.add(CertificateDetailsDTOMapper.fromCertificateToDTO(c));
         }
         return certificateDetailsDTOS;
+    }
+
+    @Override
+    public ByteArrayResource getCertificate(String serialNumber) {
+        Optional<Certificate> certificateOpt = certificateRepository.findBySerialNumber(serialNumber);
+        if (certificateOpt.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("certificate.doesNotExist", null, Locale.getDefault()));
+        }
+        Certificate certificate = certificateOpt.get();
+
+        Optional<User> ownerOpt = userRepository.findByEmail(certificate.getOwnerEmail());
+        if (ownerOpt.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("user.doesNotExist", null, Locale.getDefault()));
+        }
+        String alias = generateAlias(ownerOpt.get(), certificate);
+
+        java.security.cert.Certificate fullCertificate = keystoreUtils.readCertificate(alias);
+        try {
+            return new ByteArrayResource(fullCertificate.getEncoded());
+        } catch (CertificateEncodingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, messageSource.getMessage("certificate.encodingError", null, Locale.getDefault()));
+        }
     }
 
     private String generateAlias(User requester, Certificate certificate) {

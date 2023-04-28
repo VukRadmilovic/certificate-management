@@ -10,13 +10,18 @@ import ftn.app.model.enums.CertificateType;
 import ftn.app.service.CertificateRequestService;
 import ftn.app.service.CertificateService;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Locale;
 
 @CrossOrigin("http://localhost:4200")
@@ -76,6 +81,20 @@ public class CertificateController {
     @GetMapping(value = "/all")
     public ResponseEntity<?> getCertificates() {
         return new ResponseEntity<>(certificateService.getAllCertificates(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<?> downloadCertificate(@PathVariable String id) {
+        try {
+            ByteArrayResource resource = certificateService.getCertificate(id);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=certificate.crt")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .contentLength(resource.contentLength())
+                    .body(resource);
+        } catch (ResponseStatusException ex) {
+            return new ResponseEntity<>(ex.getReason(), ex.getStatus());
+        }
     }
 
     @GetMapping(value = "/eligible")
