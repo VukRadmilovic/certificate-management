@@ -3,6 +3,7 @@ package ftn.app.util;
 import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.*;
@@ -63,8 +64,11 @@ public class KeystoreUtils {
             loadKeystore();
             keyStore.setCertificateEntry(alias + "Cert", certificate);
             keyStore.setKeyEntry(alias + "Key", privateKey, password, new Certificate[]{certificate});
+            keyStore.store(new FileOutputStream(KEYSTORE_PATH), KEYSTORE_PASSWORD); // Save the modified keystore back to the file
         } catch (KeyStoreException e) {
             e.printStackTrace();
+        } catch (CertificateException | IOException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 
