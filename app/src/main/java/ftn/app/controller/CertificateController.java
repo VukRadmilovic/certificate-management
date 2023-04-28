@@ -83,6 +83,11 @@ public class CertificateController {
         return new ResponseEntity<>(certificateService.getAllCertificates(), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/detailedAll")
+    public ResponseEntity<?> getDetailedCertificates() {
+        return new ResponseEntity<>(certificateService.getAllDetailedCertificates(), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> downloadCertificate(@PathVariable String id) {
         try {

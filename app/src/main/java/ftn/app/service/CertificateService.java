@@ -1,6 +1,7 @@
 package ftn.app.service;
 
 import ftn.app.dto.CertificateDetailsDTO;
+import ftn.app.dto.CertificateDetailsWithUserInfoDTO;
 import ftn.app.dto.CertificateRequestDTO;
 import ftn.app.dto.WithdrawingReasonDTO;
 import ftn.app.mapper.CertificateDetailsDTOMapper;
@@ -145,6 +146,24 @@ public class CertificateService implements ICertificateService {
             certificateDetailsDTOS.add(CertificateDetailsDTOMapper.fromCertificateToDTO(c));
         }
         return certificateDetailsDTOS;
+    }
+
+    @Override
+    public List<CertificateDetailsWithUserInfoDTO> getAllDetailedCertificates() {
+        List<CertificateDetailsDTO> certificatesWithoutUserData = getAllCertificates();
+        List<CertificateDetailsWithUserInfoDTO> certificatesWithUserData = new ArrayList<>();
+
+        for (CertificateDetailsDTO certificate: certificatesWithoutUserData) {
+            Optional<User> userOpt = userRepository.findByEmail(certificate.getOwnerEmail());
+            if(userOpt.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("user.doesNotExist", null, Locale.getDefault()));
+            }
+
+            User user = userOpt.get();
+            certificatesWithUserData.add(new CertificateDetailsWithUserInfoDTO(certificate, user));
+        }
+
+        return certificatesWithUserData;
     }
 
     @Override

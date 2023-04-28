@@ -34,6 +34,7 @@ import { AdminMainComponent } from './admin/admin-main/admin-main.component';
 import { AdminReceivedRequestsComponent } from './admin/admin-received-requests/admin-received-requests.component';
 import { UserReceivedRequestsComponent } from './user/user-received-requests/user-received-requests.component';
 import { AdminNewRequestComponent } from './admin/admin-new-request/admin-new-request.component';
+import { CertificatesComponent } from './shared/certificates/certificates.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { AdminNewRequestComponent } from './admin/admin-new-request/admin-new-re
     AdminMainComponent,
     AdminReceivedRequestsComponent,
     UserReceivedRequestsComponent,
-    AdminNewRequestComponent
+    AdminNewRequestComponent,
+    CertificatesComponent
   ],
   imports: [
     BrowserModule,
