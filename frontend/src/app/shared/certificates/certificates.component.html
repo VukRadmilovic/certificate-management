@@ -25,7 +25,8 @@
 
   <ng-container matColumnDef="organizationData">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Organization</th>
-    <td class = "width-20" mat-cell *matCellDef="let element">{{ element.organizationData.name + ', ' + element.organizationData.unit + ', ' + element.organizationData.countryCode }}</td>
+    <td class="width-20" mat-cell
+        *matCellDef="let element">{{ element.organizationData.name + ', ' + element.organizationData.unit + ', ' + element.organizationData.countryCode }}</td>
   </ng-container>
 
   <ng-container matColumnDef="validFrom">
@@ -39,19 +40,28 @@
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-  <tr mat-row (click)="refreshUI(element, index)" *matRowDef="let element; columns: displayedColumns; let index=index" [class.purple]="index == cindex"></tr>
+  <tr mat-row (click)="refreshUI(element, index)" *matRowDef="let element; columns: displayedColumns; let index=index"
+      [class.purple]="index == cindex"></tr>
 </table>
-<mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons> </mat-paginator>
+<mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
 <br>
-<div class="flex-row">
-  <button mat-raised-button style="margin-right: 2em;"
-          color="primary"
-          class="width-exact"
-          [disabled]="!enableStatusChange"
-          (click)="validate()">Validate</button>
-  <button mat-raised-button color="primary"
-          style="margin-right: 2em;"
-          class="width-exact"
-          [disabled]="!enableStatusChange"
-          (click)="download()">Download</button>
+<div class="flex-column">
+  <div class="flex-row">
+    <button mat-raised-button style="margin-right: 2em;"
+            color="primary"
+            class="width-exact"
+            [disabled]="!enableStatusChange"
+            (click)="validate()">Validate
+    </button>
+    <button mat-raised-button color="primary"
+            style="margin-right: 2em;"
+            class="width-exact"
+            [disabled]="!enableStatusChange"
+            (click)="download()">Download
+    </button>
+  </div>
+  <ngx-file-drop dropZoneLabel="Drag and drop your local certificate file(s) here to validate."
+                 class="padding"
+                 (onFileDrop)="onFileDropped($event)">
+  </ngx-file-drop>
 </div>

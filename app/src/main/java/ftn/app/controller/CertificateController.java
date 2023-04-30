@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
@@ -130,6 +131,16 @@ public class CertificateController {
     public ResponseEntity<?> validateCertificate(@PathVariable String id) {
         try {
             Boolean valid = certificateService.isValidCertificate(id);
+            return new ResponseEntity<>(valid, HttpStatus.OK);
+        } catch (ResponseStatusException ex) {
+            return new ResponseEntity<>(ex.getReason(), ex.getStatus());
+        }
+    }
+
+    @PostMapping(value = "/validate")
+    public ResponseEntity<?> validateCertificate(@RequestParam("file") MultipartFile file) {
+        try {
+            Boolean valid = certificateService.isValidCertificate(file);
             return new ResponseEntity<>(valid, HttpStatus.OK);
         } catch (ResponseStatusException ex) {
             return new ResponseEntity<>(ex.getReason(), ex.getStatus());

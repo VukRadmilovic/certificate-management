@@ -6,13 +6,14 @@ import {MatSort} from "@angular/material/sort";
 import {NotificationsService} from "../notifications.service";
 import {CertificateService} from "../certificate.service";
 import {CertificateDetailsWithUserInfo} from "../model/CertificateDetailsWithUserInfo";
+import {NgxFileDropEntry} from "ngx-file-drop";
 
 @Component({
   selector: 'app-certificates',
   templateUrl: './certificates.component.html',
   styleUrls: ['./certificates.component.css']
 })
-export class CertificatesComponent implements AfterViewInit{
+export class CertificatesComponent implements AfterViewInit {
   displayedColumns: string[] = ['serialNumber', 'certificateType', 'owner.fullName', 'organizationData', 'validFrom',
     'validUntil'];
   enableStatusChange: boolean = false;
@@ -20,7 +21,7 @@ export class CertificatesComponent implements AfterViewInit{
   certificates: CertificateDetailsWithUserInfo[] = [];
   selectedCertificate!: CertificateDetailsWithUserInfo;
   denialReason: DenialReason = {
-    denialReason:''
+    denialReason: ''
   };
 
   @ViewChild(MatPaginator) paginator!: any;
@@ -30,15 +31,18 @@ export class CertificatesComponent implements AfterViewInit{
   constructor(private notificationService: NotificationsService,
               private certificateService: CertificateService) {
   }
-  ngAfterViewInit() : void {
+
+  ngAfterViewInit(): void {
     this.certificateService.getAll().subscribe((res) => {
       this.certificates = res;
       this.dataSource = new MatTableDataSource<CertificateDetailsWithUserInfo>(this.certificates);
       this.dataSource.paginator = this.paginator;
       this.dataSource.sortingDataAccessor = (item, property) => {
-        switch(property) {
-          case 'owner.fullName': return item.owner.fullName;
-          case 'organizationData': return item.organizationData.name + ', ' + item.organizationData.unit + ', ' + item.organizationData.countryCode;
+        switch (property) {
+          case 'owner.fullName':
+            return item.owner.fullName;
+          case 'organizationData':
+            return item.organizationData.name + ', ' + item.organizationData.unit + ', ' + item.organizationData.countryCode;
           default: // @ts-ignore
             return item[property];
         }
@@ -47,7 +51,7 @@ export class CertificatesComponent implements AfterViewInit{
     });
   }
 
-  public validate() : void {
+  public validate(): void {
     this.certificateService.validate(this.selectedCertificate.serialNumber).subscribe(
       result => {
         if (result) {
@@ -59,7 +63,7 @@ export class CertificatesComponent implements AfterViewInit{
     )
   }
 
-  public download() : void {
+  public download(): void {
     this.certificateService.download(this.selectedCertificate.serialNumber).subscribe(
       result => {
         const file = new Blob([result], {type: 'application/octet-stream'});
@@ -79,14 +83,51 @@ export class CertificatesComponent implements AfterViewInit{
     );
   }
 
-  public refreshUI(certificate: CertificateDetailsWithUserInfo, index: number) : void {
+  public refreshUI(certificate: CertificateDetailsWithUserInfo, index: number): void {
     this.cindex = index;
-    if (!certificate)
-    {
+    if (!certificate) {
       this.enableStatusChange = false;
       return;
     }
     this.selectedCertificate = certificate;
     this.enableStatusChange = true;
+  }
+
+  files: NgxFileDropEntry[] = [];
+
+  onFileDropped(files: NgxFileDropEntry[]) {
+    this.files = files;
+    for (const droppedFile of files) {
+      if (droppedFile.fileEntry.isFile) {
+        const fileEntry = droppedFile.fileEntry as FileSystemFileEntry;
+        fileEntry.file((file: File) => {
+          if (file.type != "application/x-x509-ca-cert") {
+            alert('Please drop only certificate files. ' + file.name + ' is not a certificate file.')
+            return;
+          }
+          if (file.size > 1000000) {
+            alert('File ' + file.name + ' is too big. Max size is 1MB.')
+            return;
+          }
+          const formData = new FormData()
+          formData.append('file', file, droppedFile.relativePath)
+
+          this.certificateService.validateFormData(formData).subscribe({
+              next: response => {
+                if (response) {
+                  alert(file.name + ' is a VALID certificate file.');
+                } else {
+                  alert(file.name + ' is NOT a valid certificate file.');
+                }
+              },
+              error: error => {
+                alert(file.name + ' is NOT a valid certificate file.');
+              }
+          });
+        });
+      } else {
+        alert('Please drop only certificate files. ' + droppedFile.relativePath + ' is not a certificate file.');
+      }
+    }
   }
 }

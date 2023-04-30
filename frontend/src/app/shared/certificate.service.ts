@@ -19,6 +19,10 @@ export class CertificateService {
     return this.http.get<boolean>(environment.apiURL + 'certificate/' + id + '/validate');
   }
 
+  public validateFormData(formData: FormData) : Observable<boolean> {
+    return this.http.post<boolean>(environment.apiURL + 'certificate/validate', formData);
+  }
+
   public download(id: string) : Observable<Blob> {
     return this.http.get(environment.apiURL + 'certificate/' + id, {responseType: 'blob'});
   }

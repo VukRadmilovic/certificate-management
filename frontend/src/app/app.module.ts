@@ -35,6 +35,7 @@ import { AdminReceivedRequestsComponent } from './admin/admin-received-requests/
 import { UserReceivedRequestsComponent } from './user/user-received-requests/user-received-requests.component';
 import { AdminNewRequestComponent } from './admin/admin-new-request/admin-new-request.component';
 import { CertificatesComponent } from './shared/certificates/certificates.component';
+import {NgxFileDropModule} from "ngx-file-drop";
 
 @NgModule({
   declarations: [
@@ -73,7 +74,8 @@ import { CertificatesComponent } from './shared/certificates/certificates.compon
     FormsModule,
     MatSelectModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    NgxFileDropModule
   ],
   providers: [    {
     provide: HTTP_INTERCEPTORS,

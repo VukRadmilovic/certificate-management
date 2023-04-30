@@ -19,13 +19,14 @@ import ftn.app.util.certificateUtils.CertificateDataUtils;
 import ftn.app.util.certificateUtils.CertificateUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
@@ -97,6 +98,24 @@ public class CertificateService implements ICertificateService {
         Certificate certificate = certificateOpt.get();
 
         return isValidCertificate(certificate);
+    }
+
+    @Override
+    public boolean isValidCertificate(MultipartFile file) {
+        if (!Objects.equals(file.getContentType(), "application/x-x509-ca-cert")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, messageSource.getMessage("certificate.invalidFile", null, Locale.getDefault()));
+        }
+
+        if (file.getSize() > 1000000) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, messageSource.getMessage("certificate.fileTooLarge", null, Locale.getDefault()));
+        }
+
+        try {
+            return isValidCertificate(certificateUtils.getSerialNumber(file));
+        } catch (CertificateException | IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
