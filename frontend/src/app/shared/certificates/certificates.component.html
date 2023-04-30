@@ -39,7 +39,7 @@
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-  <tr mat-row (click)="setButtonsStatus(element)" *matRowDef="let element; columns: displayedColumns"></tr>
+  <tr mat-row (click)="refreshUI(element, index)" *matRowDef="let element; columns: displayedColumns; let index=index" [class.purple]="index == cindex"></tr>
 </table>
 <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons> </mat-paginator>
 <br>

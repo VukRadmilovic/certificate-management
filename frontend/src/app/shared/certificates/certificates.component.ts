@@ -25,6 +25,7 @@ export class CertificatesComponent implements AfterViewInit{
 
   @ViewChild(MatPaginator) paginator!: any;
   @ViewChild(MatSort) sort!: any;
+  cindex: number = -1;
 
   constructor(private notificationService: NotificationsService,
               private certificateService: CertificateService) {
@@ -78,7 +79,8 @@ export class CertificatesComponent implements AfterViewInit{
     );
   }
 
-  public setButtonsStatus(certificate : CertificateDetailsWithUserInfo) : void {
+  public refreshUI(certificate: CertificateDetailsWithUserInfo, index: number) : void {
+    this.cindex = index;
     if (!certificate)
     {
       this.enableStatusChange = false;

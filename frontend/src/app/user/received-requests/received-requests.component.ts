@@ -28,6 +28,7 @@ export class ReceivedRequestsComponent implements AfterViewInit{
 
   @ViewChild(MatPaginator) paginator!: any;
   @ViewChild(MatSort) sort!: any;
+  cindex: number = -1;
 
   constructor(private notificationService: NotificationsService,
               private userRequestsService: UserRequestsService,
@@ -76,7 +77,8 @@ export class ReceivedRequestsComponent implements AfterViewInit{
     });
   }
 
-  public setButtonsStatus(request : CertificateRequestDetails) : void {
+  public refreshUI(request: CertificateRequestDetails, index: number) : void {
+    this.cindex = index;
     if(request.requestStatus != RequestStatus.PENDING && request.requestStatus != RequestStatus.WITHDRAWN)
     {
       this.enableStatusChange = false;
