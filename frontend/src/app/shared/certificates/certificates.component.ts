@@ -7,6 +7,17 @@ import {NotificationsService} from "../notifications.service";
 import {CertificateService} from "../certificate.service";
 import {CertificateDetailsWithUserInfo} from "../model/CertificateDetailsWithUserInfo";
 import {NgxFileDropEntry} from "ngx-file-drop";
+import {UserService} from "../user.service";
+import {
+  RequestDenyReasonDialogComponent
+} from "../../user/request-deny-reason-dialog/request-deny-reason-dialog.component";
+import {RequestStatus} from "../model/enums/RequestStatus";
+import {MatDialog} from "@angular/material/dialog";
+import {WithdrawReasonDialogComponent} from "../../user/withdraw-reason-dialog/withdraw-reason-dialog.component";
+import {UserCertificatesService} from "../../user/services/user-certificates.service";
+import {WithdrawalReason} from "../model/WithdrawalReason";
+import {HttpErrorResponse} from "@angular/common/http";
+import {CertificateType} from "../model/enums/CertificateType";
 
 @Component({
   selector: 'app-certificates',
@@ -15,13 +26,14 @@ import {NgxFileDropEntry} from "ngx-file-drop";
 })
 export class CertificatesComponent implements AfterViewInit {
   displayedColumns: string[] = ['serialNumber', 'certificateType', 'owner.fullName', 'organizationData', 'validFrom',
-    'validUntil'];
+    'validUntil','withdrawingReason'];
   enableStatusChange: boolean = false;
+  enableWithdrawChange: boolean = false;
   dataSource!: MatTableDataSource<CertificateDetailsWithUserInfo>;
   certificates: CertificateDetailsWithUserInfo[] = [];
   selectedCertificate!: CertificateDetailsWithUserInfo;
-  denialReason: DenialReason = {
-    denialReason: ''
+  withdrawalReason: WithdrawalReason = {
+    reason: ''
   };
 
   @ViewChild(MatPaginator) paginator!: any;
@@ -29,7 +41,10 @@ export class CertificatesComponent implements AfterViewInit {
   cindex: number = -1;
 
   constructor(private notificationService: NotificationsService,
-              private certificateService: CertificateService) {
+              private userService: UserService,
+              private certificateService: CertificateService,
+              private userCertificateService: UserCertificatesService,
+              public withdrawalReasonDialog: MatDialog) {
   }
 
   ngAfterViewInit(): void {
@@ -83,14 +98,36 @@ export class CertificatesComponent implements AfterViewInit {
     );
   }
 
+  public  withdraw() : void {
+    const dialogRef = this.withdrawalReasonDialog.open(WithdrawReasonDialogComponent, {
+      data: this.withdrawalReason,
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if(result == undefined || result.denialReason == '') return;
+      this.withdrawalReason = result;
+      this.userCertificateService.withdrawCertificate(this.withdrawalReason,this.selectedCertificate.serialNumber.toString()).subscribe(
+        result => {
+          window.location.reload();
+        },(err:HttpErrorResponse)=>{this.notificationService.createNotification(err.error);}
+      );
+    });
+  }
   public refreshUI(certificate: CertificateDetailsWithUserInfo, index: number): void {
     this.cindex = index;
     if (!certificate) {
       this.enableStatusChange = false;
+      this.enableWithdrawChange = false;
       return;
     }
     this.selectedCertificate = certificate;
     this.enableStatusChange = true;
+    if(this.userService.getRole() == 'ROLE_ADMIN' || (this.userService.getRole() != 'ROLE_ADMIN' && this.selectedCertificate.certificateType != CertificateType.ROOT)) {
+      this.enableWithdrawChange = true;
+    }
+    else {
+      this.enableWithdrawChange = false;
+    }
   }
 
   files: NgxFileDropEntry[] = [];

@@ -39,6 +39,11 @@
     <td mat-cell *matCellDef="let element">{{ element.validUntil | date:'yyyy-MM-dd' }}</td>
   </ng-container>
 
+  <ng-container matColumnDef="withdrawingReason">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Withdrawal Reason</th>
+    <td mat-cell *matCellDef="let element">{{ element.withdrawingReason }}</td>
+  </ng-container>
+
   <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
   <tr mat-row (click)="refreshUI(element, index)" *matRowDef="let element; columns: displayedColumns; let index=index"
       [class.purple]="index == cindex"></tr>
@@ -58,6 +63,13 @@
             class="width-exact"
             [disabled]="!enableStatusChange"
             (click)="download()">Download
+    </button>
+
+    <button mat-raised-button color="primary"
+            style="margin-right: 2em;"
+            class="width-exact"
+            [disabled]="!enableWithdrawChange"
+            (click)="withdraw()">Withdraw
     </button>
   </div>
   <ngx-file-drop dropZoneLabel="Drag and drop your local certificate file(s) here to validate."

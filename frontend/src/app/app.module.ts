@@ -36,6 +36,7 @@ import { UserReceivedRequestsComponent } from './user/user-received-requests/use
 import { AdminNewRequestComponent } from './admin/admin-new-request/admin-new-request.component';
 import { CertificatesComponent } from './shared/certificates/certificates.component';
 import {NgxFileDropModule} from "ngx-file-drop";
+import { WithdrawReasonDialogComponent } from './user/withdraw-reason-dialog/withdraw-reason-dialog.component';
 
 @NgModule({
   declarations: [
@@ -53,7 +54,8 @@ import {NgxFileDropModule} from "ngx-file-drop";
     AdminReceivedRequestsComponent,
     UserReceivedRequestsComponent,
     AdminNewRequestComponent,
-    CertificatesComponent
+    CertificatesComponent,
+    WithdrawReasonDialogComponent
   ],
   imports: [
     BrowserModule,

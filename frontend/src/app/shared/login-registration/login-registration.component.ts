@@ -19,7 +19,7 @@ export class LoginRegistrationComponent {
 
   registrationForm = new FormGroup({
     email: new FormControl( '',[Validators.required, Validators.email]),
-    password: new FormControl('',[Validators.required]),
+    password: new FormControl('',[Validators.required,Validators.pattern('^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{8,}$')]),
     name: new FormControl('',[Validators.required]),
     surname: new FormControl('',[Validators.required]),
     phoneNumber: new FormControl('', [Validators.required]),

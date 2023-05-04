@@ -85,6 +85,10 @@
                   <mat-error *ngIf="registrationForm.controls['password'].hasError('required')">
                     Password is <strong>required</strong>
                   </mat-error>
+                  <mat-error *ngIf="!registrationForm.controls['password'].hasError('required') &&
+                                registrationForm.controls['password'].hasError('pattern')">
+                    Password <strong>has to be at least 8 characters long,have no white space characters, have at least one digit, one special character and at least one uppercase letter</strong>
+                  </mat-error>
                 </mat-form-field>
               </div>
           </div>

@@ -79,7 +79,7 @@ export class ReceivedRequestsComponent implements AfterViewInit{
 
   public refreshUI(request: CertificateRequestDetails, index: number) : void {
     this.cindex = index;
-    if(request.requestStatus != RequestStatus.PENDING && request.requestStatus != RequestStatus.WITHDRAWN)
+    if(request.requestStatus != RequestStatus.PENDING)
     {
       this.enableStatusChange = false;
       return;
