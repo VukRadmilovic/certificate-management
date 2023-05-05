@@ -37,6 +37,7 @@ import { AdminNewRequestComponent } from './admin/admin-new-request/admin-new-re
 import { CertificatesComponent } from './shared/certificates/certificates.component';
 import {NgxFileDropModule} from "ngx-file-drop";
 import { WithdrawReasonDialogComponent } from './user/withdraw-reason-dialog/withdraw-reason-dialog.component';
+import {MatCheckboxModule} from "@angular/material/checkbox";
 
 @NgModule({
   declarations: [
@@ -57,28 +58,29 @@ import { WithdrawReasonDialogComponent } from './user/withdraw-reason-dialog/wit
     CertificatesComponent,
     WithdrawReasonDialogComponent
   ],
-  imports: [
-    BrowserModule,
-    RouterOutlet,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    MatTabsModule,
-    MatInputModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    MatButtonModule,
-    MatSnackBarModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatDialogModule,
-    MatSortModule,
-    MatRadioModule,
-    FormsModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    NgxFileDropModule
-  ],
+    imports: [
+        BrowserModule,
+        RouterOutlet,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        MatTabsModule,
+        MatInputModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        MatButtonModule,
+        MatSnackBarModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatDialogModule,
+        MatSortModule,
+        MatRadioModule,
+        FormsModule,
+        MatSelectModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        NgxFileDropModule,
+        MatCheckboxModule
+    ],
   providers: [    {
     provide: HTTP_INTERCEPTORS,
     useClass: InterceptorService,

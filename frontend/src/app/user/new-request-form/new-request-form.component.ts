@@ -25,6 +25,7 @@ export class NewRequestFormComponent implements AfterViewInit {
   selectedCertificate!: CertificateDetails;
   minDate = new Date();
   maxDate = new Date();
+  isChecked = true;
 
   constructor(private userCertificateService: UserCertificatesService,
               private userRequestsService: UserRequestsService,
@@ -38,7 +39,7 @@ export class NewRequestFormComponent implements AfterViewInit {
     orgName: new FormControl('',[Validators.required]),
     orgUnit: new FormControl('',[Validators.required]),
     countryCode: new FormControl('',[Validators.required, Validators.minLength(3),Validators.maxLength(3)]),
-    validUntil: new FormControl('', [Validators.required]),
+    validUntil: new FormControl(new Date(), [Validators.required]),
   });
 
   types: String[] = [
@@ -66,7 +67,7 @@ export class NewRequestFormComponent implements AfterViewInit {
       const request : CertificateRequest =  {
         issuerSerialNumber : this.selectedCertificate.serialNumber,
         certificateType: CertificateType[<string>this.requestForm.controls['certificateType'].value as CertificateType],
-        validUntil: new Date(<string>this.requestForm.controls['validUntil'].value),
+        validUntil: new Date(<Date>this.requestForm.controls['validUntil'].value),
         organizationData : {
           name : <string>this.requestForm.controls['orgName'].value,
           unit : <string>this.requestForm.controls['orgUnit'].value,
@@ -87,6 +88,47 @@ export class NewRequestFormComponent implements AfterViewInit {
     tomorrow.setDate(tomorrow.getDate() + 1);
     this.minDate = tomorrow;
     this.maxDate = row.validUntil;
-    this.requestForm.controls['validUntil'].setValue('');
+    this.giveRecommendedDate();
+  }
+
+  public handleChecked(event: any) : void {
+    if(event.checked) {
+      this.isChecked = true;
+      this.giveRecommendedDate()
+    }
+    else {
+      this.isChecked = false;
+    }
+  }
+  public giveRecommendedDate() : void {
+    if(this.isChecked) {
+      const certType = this.requestForm.controls['certificateType'].value;
+      let validUntil = new Date();
+      if (certType == 'ROOT') {
+        validUntil.setFullYear(validUntil.getFullYear() + 10);
+      }
+      else {
+        if (this.selectedCertificate != null) {
+          let proposedValidation = new Date(validUntil);
+          if (certType == 'INTERMEDIATE') {
+            proposedValidation.setFullYear(validUntil.getFullYear() + 3)
+          } else {
+            proposedValidation.setFullYear(validUntil.getFullYear() + 1)
+          }
+          if (new Date(this.selectedCertificate.validUntil) < proposedValidation) {
+            validUntil = this.selectedCertificate.validUntil;
+          } else {
+            validUntil = proposedValidation;
+          }
+        }
+      }
+      this.requestForm.controls['validUntil'].setValue(validUntil);
+    }
+    else {
+      this.requestForm.controls['validUntil'].setValue(null);
+    }
+  }
+  public checkType(type: String) : void {
+    this.giveRecommendedDate();
   }
 }

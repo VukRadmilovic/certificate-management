@@ -77,6 +77,7 @@
             Valid until is <strong>required</strong>
           </mat-error>
         </mat-form-field>
+        <mat-checkbox (change)="handleChecked($event)" [checked]="isChecked">Use recommended value</mat-checkbox>
       </div>
     </div>
 
