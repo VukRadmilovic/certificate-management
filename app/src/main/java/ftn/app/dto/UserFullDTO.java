@@ -20,6 +20,7 @@ public class UserFullDTO {
     private String email;
 
     @Length(max = 255, message = "{maxLength}")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$", message = "{passwordFormat}")
     @NotBlank(message = "{required}")
     private String password;
 

@@ -32,6 +32,12 @@ public class CertificateDetailsDTO {
     @NotNull
     @Valid
     private Date validUntil;
+
+    @NotNull
+    private boolean isValid;
+
+    @NotBlank
+    private String withdrawingReason;
     @NotNull
     @Valid
     private OrganizationData organizationData;

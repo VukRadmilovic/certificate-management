@@ -147,6 +147,16 @@ public class CertificateRequestService implements ICertificateRequestService {
     }
 
     @Override
+    public List<CertificateRequestDetailsDTO> getReceivedRequests(User user){
+        List<CertificateRequest> requests = certificateRequestRepository.findByIssuerOwner(user);
+        List<CertificateRequestDetailsDTO> certificateRequestDetailsDTOS = new ArrayList<>();
+        for (CertificateRequest r:requests) {
+            certificateRequestDetailsDTOS.add(CertificateRequestDetailsDTOMapper.fromRequestToDTO(r));
+        }
+        return certificateRequestDetailsDTOS;
+    }
+
+    @Override
     public List<CertificateRequestDetailsDTO> getAllRequests() {
         List<CertificateRequest> temp = certificateRequestRepository.findAll();
         List<CertificateRequestDetailsDTO> certificateRequestDetailsDTOS = new ArrayList<>();

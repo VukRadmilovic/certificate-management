@@ -3,20 +3,26 @@ package ftn.app.controller;
 import ftn.app.dto.CertificateRequestDTO;
 import ftn.app.dto.CertificateRequestDenialDTO;
 import ftn.app.dto.CertificateRequestDetailsDTO;
-import ftn.app.model.ResponseMessage;
+import ftn.app.dto.WithdrawingReasonDTO;
 import ftn.app.model.Role;
 import ftn.app.model.User;
 import ftn.app.model.enums.CertificateType;
 import ftn.app.service.CertificateRequestService;
 import ftn.app.service.CertificateService;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Locale;
 
 @CrossOrigin("http://localhost:4200")
@@ -47,7 +53,7 @@ public class CertificateController {
             CertificateRequestDetailsDTO requestDetailsDTO = certificateRequestService.createRequest(requestDTO,requester);
             return new ResponseEntity<>(requestDetailsDTO, HttpStatus.OK);
         } catch (ResponseStatusException ex) {
-            return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
+            return new ResponseEntity<>(ex.getReason(), ex.getStatus());
         }
     }
 
@@ -59,7 +65,7 @@ public class CertificateController {
             CertificateRequestDetailsDTO request = certificateRequestService.denyRequest(id, denialDTO.getDenialReason(), denier);
             return new ResponseEntity<>(request, HttpStatus.OK);
         } catch (ResponseStatusException ex) {
-            return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
+            return new ResponseEntity<>(ex.getReason(), ex.getStatus());
         }
     }
 
@@ -70,12 +76,42 @@ public class CertificateController {
             CertificateRequestDetailsDTO request = certificateRequestService.acceptRequest(id, accepter);
             return new ResponseEntity<>(request, HttpStatus.OK);
         } catch (ResponseStatusException ex) {
-            return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
+            return new ResponseEntity<>(ex.getReason(), ex.getStatus());
         }
     }
     @GetMapping(value = "/all")
     public ResponseEntity<?> getCertificates() {
         return new ResponseEntity<>(certificateService.getAllCertificates(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/detailedAll")
+    public ResponseEntity<?> getDetailedCertificates() {
+        return new ResponseEntity<>(certificateService.getAllDetailedCertificates(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<?> downloadCertificate(@PathVariable String id) {
+        try {
+            ByteArrayResource resource = certificateService.getCertificate(id);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=certificate.crt")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .contentLength(resource.contentLength())
+                    .body(resource);
+        } catch (ResponseStatusException ex) {
+            return new ResponseEntity<>(ex.getReason(), ex.getStatus());
+        }
+    }
+
+    @GetMapping(value = "/eligible")
+    public ResponseEntity<?> getCertificatesEligibleForIssuing() {
+        return new ResponseEntity<>(certificateService.getEligibleCertificatesForIssuing(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/requests/received")
+    public ResponseEntity<?> getReceivedRequests() {
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return new ResponseEntity<>(certificateRequestService.getReceivedRequests(user), HttpStatus.OK);
     }
 
     @GetMapping(value = "/requests")
@@ -97,7 +133,33 @@ public class CertificateController {
             Boolean valid = certificateService.isValidCertificate(id);
             return new ResponseEntity<>(valid, HttpStatus.OK);
         } catch (ResponseStatusException ex) {
-            return new ResponseEntity<>(new ResponseMessage(ex.getReason()), ex.getStatus());
+            return new ResponseEntity<>(ex.getReason(), ex.getStatus());
+        }
+    }
+
+    @PostMapping(value = "/validate")
+    public ResponseEntity<?> validateCertificate(@RequestParam("file") MultipartFile file) {
+        try {
+            Boolean valid = certificateService.isValidCertificate(file);
+            return new ResponseEntity<>(valid, HttpStatus.OK);
+        } catch (ResponseStatusException ex) {
+            return new ResponseEntity<>(ex.getReason(), ex.getStatus());
+        }
+    }
+
+    /**
+     * 
+     * @param id - serijski broj sertifikata
+     * @return sertifikat koji je povucen
+     */
+    @PutMapping(value = "/{id}/withdraw")
+    public ResponseEntity<?> withdrawCertificate(@PathVariable String id, @Valid @RequestBody WithdrawingReasonDTO reason) {
+        try{
+            User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return new ResponseEntity<>(certificateService.withdraw(user,id,reason), HttpStatus.OK);
+        }
+        catch(ResponseStatusException ex) {
+            return new ResponseEntity<>(ex.getReason(),ex.getStatus());
         }
     }
 }

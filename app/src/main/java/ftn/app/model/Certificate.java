@@ -47,6 +47,9 @@ public class Certificate {
     @Column(nullable = false)
     private String ownerEmail;
 
+    @Column
+    private String withdrawingReason;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

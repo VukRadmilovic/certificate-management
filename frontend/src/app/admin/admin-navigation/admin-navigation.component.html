@@ -1,0 +1,14 @@
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+</head>
+<nav>
+  <div class="nav-wrapper">
+    <a routerLink="/admin-main" class="brand-logo center">Certificate issuing app</a>
+    <ul id="nav-mobile" class="right hide-on-med-and-down">
+      <li routerLinkActive="active"><a routerLink="/admin-main">Certificates</a></li>
+      <li routerLinkActive="active"><a routerLink="/all-requests">All Requests</a></li>
+      <li routerLinkActive="active"><a routerLink="/admin-received-requests">Received Requests</a></li>
+      <li><a (click)="logout()">Logout</a></li>
+    </ul>
+  </div>
+</nav>

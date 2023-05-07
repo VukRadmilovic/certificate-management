@@ -1,0 +1,68 @@
+<br>
+<br>
+<div class="mat-headline-3  flex-row">Sent Requests</div>
+<table
+  mat-table
+  [dataSource]="dataSource"
+  class="mat-elevation-z8 height-50"
+  matSort>
+  <ng-container matColumnDef="issuerSerialNumber">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Issuer SN</th>
+    <td mat-cell *matCellDef="let element">{{ element.issuerSerialNumber }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="certificateType">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Certificate Type</th>
+    <td mat-cell *matCellDef="let element">
+      {{ element.certificateType }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="requester.fullName">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Requester</th>
+    <td mat-cell *matCellDef="let element">{{ element.requester.fullName}}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="organizationData">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Organization</th>
+    <td class = "width-20" mat-cell *matCellDef="let element">{{ element.organizationData.name + ', ' + element.organizationData.unit + ', ' + element.organizationData.countryCode }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="dateRequested">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Date Requested</th>
+    <td mat-cell *matCellDef="let element">{{ element.dateRequested | date:'yyyy-MM-dd' }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="validUntil">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Valid (To)</th>
+    <td mat-cell *matCellDef="let element">{{ element.validUntil | date:'yyyy-MM-dd' }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="requestStatus">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+    <td mat-cell *matCellDef="let element">{{ element.requestStatus }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="denialReason">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Denial Reason</th>
+    <td class = "width-20" mat-cell *matCellDef="let element">{{ element.denialReason }}</td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+  <tr mat-row (click)="refreshUI(element, index)" *matRowDef="let element; columns: displayedColumns; let index=index" [class.purple]="index == cindex"></tr>
+</table>
+<mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons> </mat-paginator>
+<br>
+<div class="flex-row">
+    <button mat-raised-button style="margin-right: 2em;"
+            color="primary"
+            class="width-exact"
+            [disabled]="!enableStatusChange"
+            (click)="acceptRequest()">Accept</button>
+    <button mat-raised-button color="primary"
+            style="margin-right: 2em;"
+            class="width-exact"
+            (click)="denyRequest()"
+            [disabled]="!enableStatusChange">Deny</button>
+</div>
+

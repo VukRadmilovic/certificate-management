@@ -11,6 +11,7 @@ public interface ICertificateRequestService {
     CertificateRequestDetailsDTO acceptRequest(Integer requestId, User user);
     CertificateRequestDetailsDTO denyRequest(Integer requestId, String reason, User user);
     List<CertificateRequestDetailsDTO> getUserRequests(User user);
+    List<CertificateRequestDetailsDTO> getReceivedRequests(User user);
 
     List<CertificateRequestDetailsDTO> getAllRequests();
 }
