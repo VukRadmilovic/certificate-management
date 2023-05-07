@@ -62,6 +62,7 @@ public class WebSecurityConfig {
     	http.authorizeRequests()
 					.antMatchers("/api/user/login").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/user/register").permitAll()
+				.antMatchers(HttpMethod.POST, "/api/user/confirm").permitAll()
 				.anyRequest().authenticated().and()
 				.cors().and()
 				.addFilterBefore(new TokenAuthenticationFilter(tokenUtils,  userService), BasicAuthenticationFilter.class);

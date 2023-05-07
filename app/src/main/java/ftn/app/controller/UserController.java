@@ -3,9 +3,11 @@ package ftn.app.controller;
 import ftn.app.dto.LoginDTO;
 import ftn.app.dto.TokenDTO;
 import ftn.app.dto.UserFullDTO;
+import ftn.app.dto.UserFullWithConfirmationDTO;
 import ftn.app.mapper.UserFullDTOMapper;
 import ftn.app.model.Role;
 import ftn.app.repository.RoleRepository;
+import ftn.app.service.MailService;
 import ftn.app.service.UserService;
 import ftn.app.util.TokenUtils;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -69,17 +71,33 @@ public class UserController {
     }
 
     @PostMapping(value = "/register", consumes = "application/json")
-    public ResponseEntity<?> register(@Valid @RequestBody UserFullDTO userRegister){
+    public ResponseEntity<?> registerStep1(@Valid @RequestBody UserFullDTO userRegister){
         try {
             User user = UserFullDTOMapper.fromDTOToUser(userRegister);
+
             List<Role> roles = new ArrayList<>();
             roles.add(roleRepository.findByName("ROLE_AUTHENTICATED").get());
             user.setRoles(roles);
+            user.setIsConfirmed(false);
             userService.register(user);
+
+            userService.sendConfirmationEmail(user);
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
         }
         catch (ResponseStatusException ex){
             return new ResponseEntity<>(messageSource.getMessage("user.email.exists", null, Locale.getDefault()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping(value = "/confirm", consumes = "application/json")
+    public ResponseEntity<?> registerStep2(@Valid @RequestBody UserFullWithConfirmationDTO userRegister){
+        try{
+            User user = UserFullDTOMapper.fromDTOToUser(userRegister);
+            userService.confirmation(user, userRegister.getConfirmation());
+            return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
+        }
+        catch (BadCredentialsException ex){
+            return new ResponseEntity<>(messageSource.getMessage("user.invalidConfirmation", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
         }
     }
 }
