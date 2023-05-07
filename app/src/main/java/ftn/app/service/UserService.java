@@ -1,5 +1,6 @@
 package ftn.app.service;
 
+import ftn.app.dto.LoginDTO;
 import ftn.app.model.Confirmation;
 import ftn.app.model.User;
 import ftn.app.repository.ConfirmationRepository;
@@ -84,5 +85,13 @@ public class UserService implements IUserService {
         confirmation.setExpired(false);
         confirmationRepository.save(confirmation);
         mailService.sendSimpleMessage(user.getEmail(), "Email confirmation", confirmation.getConfirmation());
+    }
+
+    @Override
+    public Boolean isConfirmed(LoginDTO loginInfo) {
+        if(userRepository.findByEmail(loginInfo.getEmail()).get().getIsConfirmed()){
+            return true;
+        }
+        throw new BadCredentialsException("Bad credentials");
     }
 }

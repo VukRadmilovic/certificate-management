@@ -54,6 +54,7 @@ public class UserController {
     @PostMapping(value = "/login", consumes = "application/json")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginInfo) {
         try {
+            userService.isConfirmed(loginInfo);
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginInfo.getEmail(), loginInfo.getPassword()));
 
