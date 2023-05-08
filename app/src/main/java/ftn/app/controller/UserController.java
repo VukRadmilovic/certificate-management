@@ -4,7 +4,6 @@ import ftn.app.dto.*;
 import ftn.app.mapper.UserFullDTOMapper;
 import ftn.app.model.Role;
 import ftn.app.repository.RoleRepository;
-import ftn.app.service.MailService;
 import ftn.app.service.UserService;
 import ftn.app.util.TokenUtils;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -78,7 +77,7 @@ public class UserController {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = (User) authentication.getPrincipal();
-            String jwt = tokenUtils.generateToken(user.getUsername(), (user.getRoles()).get(0));
+            tokenUtils.generateToken(user.getUsername(), (user.getRoles()).get(0));
             userService.sendConfirmationEmail(user);
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
         } catch (ExpiredJwtException ex) {
@@ -97,7 +96,7 @@ public class UserController {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = (User) authentication.getPrincipal();
-            String jwt = tokenUtils.generateToken(user.getUsername(), (user.getRoles()).get(0));
+            tokenUtils.generateToken(user.getUsername(), (user.getRoles()).get(0));
             userService.sendConfirmationMessage(user);
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
         } catch (ExpiredJwtException ex) {
