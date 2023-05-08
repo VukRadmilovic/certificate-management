@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import {RouterOutlet} from "@angular/router";
 import { LoginRegistrationComponent } from './shared/login-registration/login-registration.component';
+import { ConfirmDialog } from './shared/confirm-dialog/confirm-dialog';
 import {AppRoutingModule} from "./app-routing.module";
 import {InterceptorService} from "./shared/interceptor/interceptor.service";
 import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
@@ -42,6 +43,7 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
 @NgModule({
   declarations: [
     AppComponent,
+    ConfirmDialog,
     LoginRegistrationComponent,
     UserNavigationComponent,
     UserMainComponent,

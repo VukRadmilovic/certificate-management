@@ -6,7 +6,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface IUserService extends UserDetailsService {
     User register(User user);
-    Boolean confirmation(User user, String confiramtion);
+    Boolean confirmation(User user, String confirmation);
+
+    Boolean registerConfirmation(User user, String confirmation);
+    Boolean passwordConfirmation(User user, String confirmation);
 
     void sendConfirmationEmail(User user);
 

@@ -8,6 +8,8 @@ import {JwtHelperService} from "@auth0/angular-jwt";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {NotificationsService} from "./notifications.service";
 import {User} from "./model/User";
+import {UserWithConfirmation} from "./model/UserWithConfirmation";
+import {PasswordConfirmation} from "./model/PasswordConfirmation";
 
 @Injectable({
   providedIn: 'root'
@@ -27,9 +29,38 @@ export class UserService {
       headers: this.headers,
     });
   }
+  public login1(auth: LoginCredentials): Observable<Token> {
+    return this.http.post<Token>(environment.apiURL + 'user/login/sendEmail', auth, {
+      headers: this.headers,
+    });
+  }
 
   public logout(): void {
     sessionStorage.removeItem('user');
+  }
+
+  public confirm(user : UserWithConfirmation) : Observable<ArrayBuffer> {
+    const options: any = {
+      responseType: 'text',
+      headers:this.headers
+    };
+    return this.http.post(environment.apiURL + 'user/confirm', user, options);
+  }
+
+  public resetPassword(user : PasswordConfirmation): Observable<ArrayBuffer> {
+    const options: any = {
+      responseType: 'text',
+      headers:this.headers
+    };
+    return this.http.post(environment.apiURL + 'user/passwordReset/sendEmail', user, options);
+  }
+
+  public resetPassword2(user : PasswordConfirmation): Observable<ArrayBuffer> {
+    const options: any = {
+      responseType: 'text',
+      headers:this.headers
+    };
+    return this.http.post(environment.apiURL + 'user/passwordReset', user, options);
   }
 
   public register(user : User) : Observable<ArrayBuffer> {

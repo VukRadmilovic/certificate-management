@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {LoginCredentials} from "../model/LoginCredentials";
 import {UserService} from "../user.service";
 import {Router} from "@angular/router";
 import {NotificationsService} from "../notifications.service";
 import {User} from "../model/User";
+import {MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {PasswordConfirmation} from "../model/PasswordConfirmation";
+import {UserWithConfirmation} from "../model/UserWithConfirmation";
 
 @Component({
   selector: 'app-login-registration',
@@ -15,6 +18,7 @@ export class LoginRegistrationComponent {
   loginForm = new FormGroup({
     email: new FormControl( '',[Validators.required, Validators.email]),
     password: new FormControl('',[Validators.required]),
+    confirmation: new FormControl('', [Validators.required]),
   });
 
   registrationForm = new FormGroup({
@@ -23,14 +27,89 @@ export class LoginRegistrationComponent {
     name: new FormControl('',[Validators.required]),
     surname: new FormControl('',[Validators.required]),
     phoneNumber: new FormControl('', [Validators.required]),
+    confirmation: new FormControl('', [Validators.required]),
   });
+
+  passwordResetForm = new FormGroup({
+    password: new FormControl('',[Validators.required,Validators.pattern('^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{8,}$')]),
+    confirmPassword: new FormControl('',[Validators.required]),
+    email: new FormControl( '',[Validators.required, Validators.email]),
+    confirmation: new FormControl('', [Validators.required])
+  })
 
   constructor(private userService : UserService,
               private router: Router,
-              private notificationService: NotificationsService) {
+              private notificationService: NotificationsService,
+              public dialog: MatDialog) {
   }
 
-  login() : void {
+  resetPassword(): void{
+    if (this.passwordResetForm.valid){
+      const user : PasswordConfirmation = {
+        email: <string>this.passwordResetForm.value.email,
+        password: <string>this.passwordResetForm.value.confirmPassword,
+        confirmation: "1"
+      };
+      this.userService.resetPassword(user).subscribe({
+        next: (result) => {
+          this.notificationService.createNotification("Confirm email!");
+        },
+        error: () => {
+          this.notificationService.createNotification("Email is not correct!");
+        },
+      });
+    }
+  }
+
+  resetPassword2(): void{
+    if (this.passwordResetForm.valid){
+      const user : PasswordConfirmation = {
+        email: <string>this.passwordResetForm.value.email,
+        password: <string>this.passwordResetForm.value.confirmPassword,
+        confirmation: <string>this.passwordResetForm.value.confirmation,
+      };
+      this.userService.resetPassword2(user).subscribe({
+        next: (result) => {
+          this.notificationService.createNotification("Password reset!");
+        },
+        error: () => {
+          this.notificationService.createNotification("Email is not correct!");
+        },
+      });
+    }
+  }
+
+  /*openDialog(): void {
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      data: { loginRegisterPassword: this.loginRegisterPassword, email: this.email,
+        password: this.password, confirmation:this.confirmation,
+        go: this.go },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      this.go = result
+    });
+  }*/
+
+  login1() : void {
+    if (this.loginForm.valid) {
+      const loginVal : LoginCredentials = {
+        email: <string>this.loginForm.value.email,
+        password: <string>this.loginForm.value.password,
+      };
+      this.userService.login1(loginVal).subscribe({
+        next: (result) => {
+          this.notificationService.createNotification("Confirm email!");
+        },
+        error: () => {
+          this.notificationService.createNotification("Email or password is not correct!");
+        },
+      });
+    }
+  }
+
+  login(): void {
     if (this.loginForm.valid) {
       const loginVal : LoginCredentials = {
         email: <string>this.loginForm.value.email,
@@ -61,12 +140,40 @@ export class LoginRegistrationComponent {
 
       this.userService.register(user).subscribe( {
         next: () => {
-          this.notificationService.createNotification("User successfully registered!");
+          /*this.notificationService.createNotification("User successfully registered! Confirm user!");
+          this.loginRegisterPassword = 2;
+          this.email = user.email;
+          this.password = user.password;
+          this.openDialog()*/
+          this.notificationService.createNotification("Confirm identity!")
         },
         error: (error) => {
           this.notificationService.createNotification(error.error);
         }
-    });
+      });
+    }
+  }
+
+  register2() : void {
+    if (this.registrationForm.valid) {
+      const user: UserWithConfirmation = {
+        name: <string>this.registrationForm.value.name,
+        surname: <string>this.registrationForm.value.surname,
+        phoneNumber: <string>this.registrationForm.value.phoneNumber,
+        email: <string>this.registrationForm.value.email,
+        password: <string>this.registrationForm.value.password,
+        confirmation: <string>this.registrationForm.value.confirmation
+      }
+
+
+      this.userService.confirm(user).subscribe( {
+        next: () => {
+          this.notificationService.createNotification("User successfully confirmed!");
+        },
+        error: (error) => {
+          this.notificationService.createNotification(error.error);
+        }
+      });
     }
   }
 }

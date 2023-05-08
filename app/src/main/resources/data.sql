@@ -4,10 +4,15 @@ INSERT INTO ROLE (NAME) VALUES
     ('ROLE_ADMIN');
 
 INSERT INTO USERS(EMAIL, PASSWORD, NAME, SURNAME, PHONE_NUMBER, IS_CONFIRMED) VALUES ('mail1@mail.com',
-                    '$2a$10$IgPBrBNNOaCVhb4dGmEKLeMPndC09k30PbQq..kMghoDzZNYicVG6',
-                    'Maja',
-                    'Varga',
-                    '+381627834992', true);
+                                                                                      '$2a$10$IgPBrBNNOaCVhb4dGmEKLeMPndC09k30PbQq..kMghoDzZNYicVG6',
+                                                                                      'Maja',
+                                                                                      'Varga',
+                                                                                      '+381627834992', true);
+/*INSERT INTO USERS(EMAIL, PASSWORD, NAME, SURNAME, PHONE_NUMBER, IS_CONFIRMED) VALUES ('marko.milijanovic2001@gmail.com',
+                                                                                      '$2a$10$IgPBrBNNOaCVhb4dGmEKLeMPndC09k30PbQq..kMghoDzZNYicVG6',
+                                                                                      'Marko',
+                                                                                      'Milijanovic',
+                                                                                      '+381627834992', true);*/
 INSERT INTO USERS(EMAIL, PASSWORD, NAME, SURNAME, PHONE_NUMBER, IS_CONFIRMED) VALUES ('mail2@mail.com',
                     '$2a$10$E3fnG2Z/pNYdQCuMOSYCn.UyTLW1zXfCwR.ds5j9IztyJ0TIjRyJG',
                     'Milan',

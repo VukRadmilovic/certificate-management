@@ -1,9 +1,6 @@
 package ftn.app.controller;
 
-import ftn.app.dto.LoginDTO;
-import ftn.app.dto.TokenDTO;
-import ftn.app.dto.UserFullDTO;
-import ftn.app.dto.UserFullWithConfirmationDTO;
+import ftn.app.dto.*;
 import ftn.app.mapper.UserFullDTOMapper;
 import ftn.app.model.Role;
 import ftn.app.repository.RoleRepository;
@@ -54,6 +51,9 @@ public class UserController {
     @PostMapping(value = "/login", consumes = "application/json")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginInfo) {
         try {
+            User tempUser = new User();
+            tempUser.setEmail(loginInfo.getEmail());
+            userService.confirmation(tempUser, loginInfo.getConfirmation());
             userService.isConfirmed(loginInfo);
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginInfo.getEmail(), loginInfo.getPassword()));
@@ -62,17 +62,34 @@ public class UserController {
             User user = (User) authentication.getPrincipal();
             String jwt = tokenUtils.generateToken(user.getUsername(), (user.getRoles()).get(0));
             return new ResponseEntity<>(new TokenDTO(jwt), HttpStatus.OK);
-        }
-        catch (ExpiredJwtException ex){
+        } catch (ExpiredJwtException ex) {
             return new ResponseEntity<>(messageSource.getMessage("jwt.ExpiredToken", null, Locale.getDefault()), HttpStatus.UNAUTHORIZED);
+        } catch (BadCredentialsException ex) {
+            return new ResponseEntity<>(messageSource.getMessage("user.notFound", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
         }
-        catch (BadCredentialsException ex) {
+    }
+
+    @PostMapping(value = "/login/sendEmail", consumes = "application/json")
+    public ResponseEntity<?> login1(@Valid @RequestBody LoginDTO loginInfo) {
+        try {
+            userService.isConfirmed(loginInfo);
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    loginInfo.getEmail(), loginInfo.getPassword()));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            User user = (User) authentication.getPrincipal();
+            String jwt = tokenUtils.generateToken(user.getUsername(), (user.getRoles()).get(0));
+            userService.sendConfirmationEmail(user);
+            return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
+        } catch (ExpiredJwtException ex) {
+            return new ResponseEntity<>(messageSource.getMessage("jwt.ExpiredToken", null, Locale.getDefault()), HttpStatus.UNAUTHORIZED);
+        } catch (BadCredentialsException ex) {
             return new ResponseEntity<>(messageSource.getMessage("user.notFound", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping(value = "/register", consumes = "application/json")
-    public ResponseEntity<?> registerStep1(@Valid @RequestBody UserFullDTO userRegister){
+    public ResponseEntity<?> registerStep1(@Valid @RequestBody UserFullDTO userRegister) {
         try {
             User user = UserFullDTOMapper.fromDTOToUser(userRegister);
 
@@ -84,20 +101,44 @@ public class UserController {
 
             userService.sendConfirmationEmail(user);
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
-        }
-        catch (ResponseStatusException ex){
+        } catch (ResponseStatusException ex) {
             return new ResponseEntity<>(messageSource.getMessage("user.email.exists", null, Locale.getDefault()), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping(value = "/confirm", consumes = "application/json")
-    public ResponseEntity<?> registerStep2(@Valid @RequestBody UserFullWithConfirmationDTO userRegister){
-        try{
-            User user = UserFullDTOMapper.fromDTOToUser(userRegister);
-            userService.confirmation(user, userRegister.getConfirmation());
+    public ResponseEntity<?> registerStep2(@Valid @RequestBody UserFullWithConfirmationDTO userRegister) {
+        try {
+            User user = new User();
+            user.setEmail(userRegister.getEmail());
+            userService.registerConfirmation(user, userRegister.getConfirmation());
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
+        } catch (BadCredentialsException ex) {
+            return new ResponseEntity<>(messageSource.getMessage("user.invalidConfirmation", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
         }
-        catch (BadCredentialsException ex){
+    }
+
+    @PostMapping(value = "/passwordReset/sendEmail", consumes = "application/json")
+    public ResponseEntity<?> passwordResetSendEmail(@Valid @RequestBody PasswordConfirmationDTO dto) {
+        try {
+            User user = new User();
+            user.setEmail(dto.getEmail());
+            userService.sendConfirmationEmail(user);
+            return new ResponseEntity<>(messageSource.getMessage("user.passwordReset.emailSent", null, Locale.getDefault()), HttpStatus.OK);
+        } catch (BadCredentialsException ex) {
+            return new ResponseEntity<>(messageSource.getMessage("user.invalidConfirmation", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping(value = "/passwordReset", consumes = "application/json")
+    public ResponseEntity<?> passwordReset(@Valid @RequestBody PasswordConfirmationDTO dto) {
+        try {
+            User user = new User();
+            user.setEmail(dto.getEmail());
+            user.setPassword(dto.getPassword());
+            userService.passwordConfirmation(user, dto.getConfirmation());
+            return new ResponseEntity<>(messageSource.getMessage("user.passwordReset", null, Locale.getDefault()), HttpStatus.OK);
+        } catch (BadCredentialsException ex) {
             return new ResponseEntity<>(messageSource.getMessage("user.invalidConfirmation", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
         }
     }

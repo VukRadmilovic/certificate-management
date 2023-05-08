@@ -29,9 +29,25 @@
               <mat-error *ngIf="loginForm.controls['password'].hasError('required')">
                 Password is <strong>required</strong>
               </mat-error>
+            </mat-form-field><br>
+            <mat-form-field>
+              <mat-label>Confirmation</mat-label>
+              <input matInput formControlName="confirmation" type="text">
+              <mat-error *ngIf="loginForm.controls['confirmation'].hasError('required')">
+                Confirmation is <strong>required</strong>
+              </mat-error>
             </mat-form-field>
             <br>
-            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="login()">Login</button>
+
+            <mat-radio-group aria-label="Confirmation">
+              <mat-radio-button value="1">E-mail</mat-radio-button>
+              <mat-radio-button value="2">Whatsapp</mat-radio-button>
+            </mat-radio-group>
+
+            <br>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="login1()">Login</button>
+            <br>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="login()">Confirm</button>
           </form>
         </div>
       </mat-tab>
@@ -90,9 +106,79 @@
                     Password <strong>has to be at least 8 characters long,have no white space characters, have at least one digit, one special character and at least one uppercase letter</strong>
                   </mat-error>
                 </mat-form-field>
+                <br>
+                <mat-form-field>
+                  <mat-label>Confirmation</mat-label>
+                  <input matInput formControlName="confirmation" type="text">
+                </mat-form-field>
+                <br>
+                <mat-radio-group aria-label="Select an option">
+                  <mat-radio-button value="1">E-mail</mat-radio-button>
+                  <mat-radio-button value="2">Whatsapp</mat-radio-button>
+                </mat-radio-group>
               </div>
-          </div>
+            </div>
             <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="register()">Register</button>
+            <br>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="register2()">Confirm</button>
+          </form>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Password Reset">
+        <div class="padding flex-column">
+          <div class="mat-headline-3" style="margin-bottom: 40px;">Password Reset</div>
+          <form [formGroup]="passwordResetForm" class="flex-column center-horizontal width-100">
+            <div class = "flex-row">
+              <div class="width-50 flex-column padding">
+
+                <mat-form-field>
+                  <mat-label>Password</mat-label>
+                  <input matInput formControlName="password" type="password">
+                  <mat-error *ngIf="passwordResetForm.controls['password'].hasError('required')">
+                    Password is <strong>required</strong>
+                  </mat-error>
+                  <mat-error *ngIf="!passwordResetForm.controls['password'].hasError('required') &&
+                                registrationForm.controls['password'].hasError('pattern')">
+                    Password <strong>has to be at least 8 characters long,have no white space characters, have at least one digit, one special character and at least one uppercase letter</strong>
+                  </mat-error>
+                </mat-form-field>
+                <br>
+                <mat-form-field>
+                  <mat-label>Confirm Password</mat-label>
+                  <input matInput formControlName="confirmPassword" type="password">
+                  <mat-error *ngIf="passwordResetForm.controls['confirmPassword'].hasError('required')">
+                    Field is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+                <br>
+                <mat-form-field>
+                  <mat-label>Email</mat-label>
+                  <input type="email" matInput formControlName="email" placeholder="Ex. pat@example.com">
+                  <mat-error *ngIf="passwordResetForm.controls['email'].hasError('email') && !passwordResetForm.controls['email'].hasError('required')">
+                    Please enter a valid email address
+                  </mat-error>
+                  <mat-error *ngIf="passwordResetForm.controls['email'].hasError('required')">
+                    Email is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>Confirmation</mat-label>
+                  <input type="text" matInput formControlName="confirmation">
+                  <mat-error *ngIf="passwordResetForm.controls['confirmation'].hasError('required')">
+                    Confirmation is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+                <br>
+                <mat-radio-group aria-label="Confirmation">
+                  <mat-radio-button value="1">E-mail</mat-radio-button>
+                  <mat-radio-button value="2">Whatsapp</mat-radio-button>
+                </mat-radio-group>
+              </div>
+            </div>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="resetPassword()">Reset</button>
+            <br>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="resetPassword2()">Confirm</button>
           </form>
         </div>
       </mat-tab>

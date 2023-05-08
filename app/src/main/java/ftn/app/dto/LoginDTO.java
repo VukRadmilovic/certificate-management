@@ -15,4 +15,5 @@ public class LoginDTO {
     private String password;
     @NotBlank
     private String email;
+    private String confirmation;
 }

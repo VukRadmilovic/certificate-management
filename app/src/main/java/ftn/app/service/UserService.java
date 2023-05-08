@@ -60,24 +60,46 @@ public class UserService implements IUserService {
         Optional<Confirmation> existing = confirmationRepository.findByUserAndExpired(user, false);
         if(existing.isPresent()){
             if(existing.get().getConfirmation().equals(confirmation)){
-                confirmationRepository.delete(existing.get());
-                user.setIsConfirmed(true);
-                userRepository.save(user);
+                Confirmation confirmation1 = existing.get();
+                confirmation1.setExpired(true);
+                confirmationRepository.save(confirmation1);
                 return true;
             }
-            else {
-                throw new BadCredentialsException("user.invalidConfirmation");
-            }
         }
-        else {
+        return false;
+    }
+
+    @Override
+    public Boolean registerConfirmation(User user, String confirmation) {
+        user = userRepository.findByEmail(user.getEmail()).get();
+        if(confirmation(user, confirmation)){
+            user.setIsConfirmed(true);
+            userRepository.save(user);
+            return true;
+        }
+        else{
+            throw new BadCredentialsException("user.invalidConfirmation");
+        }
+    }
+
+    @Override
+    public Boolean passwordConfirmation(User user, String confirmation) {
+        String password = user.getPassword();
+        user = userRepository.findByEmail(user.getEmail()).get();
+        if(confirmation(user, confirmation)){
+
+            user.setPassword(passwordEncoder().encode(password));
+            userRepository.save(user);
+            return true;
+        }
+        else{
             throw new BadCredentialsException("user.invalidConfirmation");
         }
     }
 
     @Override
     public void sendConfirmationEmail(User user) {
-        //Optional<Confirmation> existing = confirmationRepository.findByUserAndExpired(user, false);
-        //existing.ifPresent(confirmationRepository::delete);
+        user = userRepository.findByEmail(user.getEmail()).get();
         int confirmationString = (int) Math.floor(Math.random() * (99999 - 10000 + 1) + 10000);
         Confirmation confirmation = new Confirmation();
         confirmation.setConfirmation(Integer.toString(confirmationString));

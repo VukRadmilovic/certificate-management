@@ -60,9 +60,12 @@ public class WebSecurityConfig {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint);
     	http.authorizeRequests()
-					.antMatchers("/api/user/login").permitAll()
+				.antMatchers("/api/user/login").permitAll()
+				.antMatchers("/api/user/login/sendEmail").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/user/register").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/user/confirm").permitAll()
+				.antMatchers(HttpMethod.POST, "/api/user/passwordReset/sendEmail").permitAll()
+				.antMatchers(HttpMethod.POST, "/api/user/passwordReset").permitAll()
 				.anyRequest().authenticated().and()
 				.cors().and()
 				.addFilterBefore(new TokenAuthenticationFilter(tokenUtils,  userService), BasicAuthenticationFilter.class);
