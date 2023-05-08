@@ -88,8 +88,27 @@ public class UserController {
         }
     }
 
-    @PostMapping(value = "/register", consumes = "application/json")
-    public ResponseEntity<?> registerStep1(@Valid @RequestBody UserFullDTO userRegister) {
+    @PostMapping(value = "/login/sendMessage", consumes = "application/json")
+    public ResponseEntity<?> loginWhatsapp(@Valid @RequestBody LoginDTO loginInfo) {
+        try {
+            userService.isConfirmed(loginInfo);
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    loginInfo.getEmail(), loginInfo.getPassword()));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            User user = (User) authentication.getPrincipal();
+            String jwt = tokenUtils.generateToken(user.getUsername(), (user.getRoles()).get(0));
+            userService.sendConfirmationEmail(user);
+            return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
+        } catch (ExpiredJwtException ex) {
+            return new ResponseEntity<>(messageSource.getMessage("jwt.ExpiredToken", null, Locale.getDefault()), HttpStatus.UNAUTHORIZED);
+        } catch (BadCredentialsException ex) {
+            return new ResponseEntity<>(messageSource.getMessage("user.notFound", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping(value = "/register/wEmail", consumes = "application/json")
+    public ResponseEntity<?> registerWEmail(@Valid @RequestBody UserFullDTO userRegister) {
         try {
             User user = UserFullDTOMapper.fromDTOToUser(userRegister);
 
@@ -98,15 +117,30 @@ public class UserController {
             user.setRoles(roles);
             user.setIsConfirmed(false);
             userService.register(user);
-
             userService.sendConfirmationEmail(user);
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
         } catch (ResponseStatusException ex) {
             return new ResponseEntity<>(messageSource.getMessage("user.email.exists", null, Locale.getDefault()), HttpStatus.BAD_REQUEST);
         }
     }
+    @PostMapping(value = "/register/wMessage", consumes = "application/json")
+    public ResponseEntity<?> registerWMessage(@Valid @RequestBody UserFullDTO userRegister) {
+        try {
+            User user = UserFullDTOMapper.fromDTOToUser(userRegister);
 
-    @PostMapping(value = "/confirm", consumes = "application/json")
+            List<Role> roles = new ArrayList<>();
+            roles.add(roleRepository.findByName("ROLE_AUTHENTICATED").get());
+            user.setRoles(roles);
+            user.setIsConfirmed(false);
+            userService.register(user);
+            userService.sendConfirmationMessage(user);
+            return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
+        } catch (ResponseStatusException ex) {
+            return new ResponseEntity<>(messageSource.getMessage("user.email.exists", null, Locale.getDefault()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping(value = "/register", consumes = "application/json")
     public ResponseEntity<?> registerStep2(@Valid @RequestBody UserFullWithConfirmationDTO userRegister) {
         try {
             User user = new User();

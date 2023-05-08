@@ -13,5 +13,9 @@ public interface IUserService extends UserDetailsService {
 
     void sendConfirmationEmail(User user);
 
+    void sendConfirmationMessage(User user);
+
     Boolean isConfirmed(LoginDTO loginInfo);
+
+    void sendWhatsappMessage(String number, String message);
 }

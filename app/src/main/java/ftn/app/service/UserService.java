@@ -1,5 +1,8 @@
 package ftn.app.service;
 
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 import ftn.app.dto.LoginDTO;
 import ftn.app.model.Confirmation;
 import ftn.app.model.User;
@@ -110,10 +113,29 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public void sendConfirmationMessage(User user) {
+        user = userRepository.findByEmail(user.getEmail()).get();
+        int confirmationString = (int) Math.floor(Math.random() * (99999 - 10000 + 1) + 10000);
+        Confirmation confirmation = new Confirmation();
+        confirmation.setConfirmation(Integer.toString(confirmationString));
+        confirmation.setUser(user);
+        confirmation.setExpired(false);
+        confirmationRepository.save(confirmation);
+        sendWhatsappMessage(user.getPhoneNumber(), confirmation.getConfirmation());
+    }
+
+    @Override
     public Boolean isConfirmed(LoginDTO loginInfo) {
         if(userRepository.findByEmail(loginInfo.getEmail()).get().getIsConfirmed()){
             return true;
         }
         throw new BadCredentialsException("Bad credentials");
     }
+    @Override
+    public void sendWhatsappMessage(String number, String message){
+        Twilio.init("AC559b6719c0f31fd677511078de1cab33","5b27e33063288b850cf7dc5a687719dc");
+        Message.creator(new PhoneNumber("whatsapp:"+number),
+                new PhoneNumber("whatsapp:+14155238886"), message).create();
+    }
+
 }
