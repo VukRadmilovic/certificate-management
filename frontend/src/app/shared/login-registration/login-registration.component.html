@@ -5,12 +5,11 @@
   <br>
   <br>
   <br>
-  <div class="width-70 center-horizontal border height-70">
+  <div class="width-70 center-horizontal border height-90">
     <mat-tab-group>
       <mat-tab label="Login">
         <div class="padding flex-column">
-          <br>
-          <div class="mat-headline-3">Login</div>
+          <div class="mat-headline-3" style="margin-bottom: 30px;">Login</div>
           <form [formGroup]="loginForm" class="flex-column center-horizontal width-50">
             <mat-form-field>
               <mat-label>Email</mat-label>
@@ -38,22 +37,25 @@
               </mat-error>
             </mat-form-field>
             <br>
+            <b><label id="example-radio-group-label">Confirmation mode</label></b>
               <mat-radio-group aria-label="Confirmation">
                 <mat-radio-button (click)="selectEmail()">E-mail</mat-radio-button>
                 <mat-radio-button (click)="selectTel()">Whatsapp</mat-radio-button>
               </mat-radio-group>
 
             <br>
+            <div class="flex-row width-40 center-horizontal">
             <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="login1()">Login</button>
             <br>
             <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="login()">Confirm</button>
+            </div>
           </form>
         </div>
       </mat-tab>
 
       <mat-tab label="Registration">
         <div class="padding flex-column">
-          <div class="mat-headline-3" style="margin-bottom: 40px;">Registration</div>
+          <div class="mat-headline-3" style="margin-bottom: 30px;">Registration</div>
           <form [formGroup]="registrationForm" class="flex-column center-horizontal width-100">
             <div class = "flex-row">
               <div class="width-50 flex-column padding">
@@ -110,27 +112,31 @@
                   <mat-label>Confirmation</mat-label>
                   <input matInput formControlName="confirmation" type="text">
                 </mat-form-field>
-                <br>
-                <mat-radio-group aria-label="Confirmation">
-                  <mat-radio-button (click)="selectEmail()">E-mail</mat-radio-button>
-                  <mat-radio-button (click)="selectTel()">Whatsapp</mat-radio-button>
-                </mat-radio-group>
+
+
               </div>
             </div>
+            <b><label>Confirmation mode</label></b>
+            <mat-radio-group aria-label="Confirmation">
+              <mat-radio-button (click)="selectEmail()">E-mail</mat-radio-button>
+              <mat-radio-button (click)="selectTel()">Whatsapp</mat-radio-button>
+            </mat-radio-group>
+            <br>
+            <div class="flex-row width-40 center-horizontal">
             <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="register()">Register</button>
             <br>
             <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="register2()">Confirm</button>
+            </div>
           </form>
         </div>
       </mat-tab>
 
       <mat-tab label="Password Reset">
-        <div class="padding flex-column">
+        <br>
           <div class="mat-headline-3" style="margin-bottom: 40px;">Password Reset</div>
           <form [formGroup]="passwordResetForm" class="flex-column center-horizontal width-100">
-            <div class = "flex-row">
-              <div class="width-50 flex-column padding">
-
+              <div class="width-100 flex-row">
+                <div class="flex-column width-50 padding">
                 <mat-form-field>
                   <mat-label>Password</mat-label>
                   <input matInput formControlName="password" type="password">
@@ -150,7 +156,8 @@
                     Field is <strong>required</strong>
                   </mat-error>
                 </mat-form-field>
-                <br>
+                </div>
+                <div class="flex-column width-50 padding">
                 <mat-form-field>
                   <mat-label>Email</mat-label>
                   <input type="email" matInput formControlName="email" placeholder="Ex. pat@example.com">
@@ -168,18 +175,22 @@
                     Confirmation is <strong>required</strong>
                   </mat-error>
                 </mat-form-field>
+                </div>
+                </div>
                 <br>
+                <b><label>Confirmation mode</label></b>
                 <mat-radio-group aria-label="Confirmation">
                   <mat-radio-button (click)="selectEmail()">E-mail</mat-radio-button>
                   <mat-radio-button (click)="selectTel()">Whatsapp</mat-radio-button>
                 </mat-radio-group>
-              </div>
-            </div>
+            <br>
+            <div class="flex-row width-40 center-horizontal">
             <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="resetPassword()">Reset</button>
             <br>
             <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="resetPassword2()">Confirm</button>
+            </div>
+            <br>
           </form>
-        </div>
       </mat-tab>
     </mat-tab-group>
   </div>
