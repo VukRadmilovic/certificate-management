@@ -29,8 +29,13 @@ export class UserService {
       headers: this.headers,
     });
   }
-  public login1(auth: LoginCredentials): Observable<Token> {
+  public loginEmail(auth: LoginCredentials): Observable<Token> {
     return this.http.post<Token>(environment.apiURL + 'user/login/sendEmail', auth, {
+      headers: this.headers,
+    });
+  }
+  public loginMessage(auth: LoginCredentials): Observable<Token> {
+    return this.http.post<Token>(environment.apiURL + 'user/login/sendMessage', auth, {
       headers: this.headers,
     });
   }
@@ -39,20 +44,27 @@ export class UserService {
     sessionStorage.removeItem('user');
   }
 
-  public confirm(user : UserWithConfirmation) : Observable<ArrayBuffer> {
+  public register(user : UserWithConfirmation) : Observable<ArrayBuffer> {
     const options: any = {
       responseType: 'text',
       headers:this.headers
     };
-    return this.http.post(environment.apiURL + 'user/confirm', user, options);
+    return this.http.post(environment.apiURL + 'user/register', user, options);
   }
 
-  public resetPassword(user : PasswordConfirmation): Observable<ArrayBuffer> {
+  public resetPasswordEmail(user : PasswordConfirmation): Observable<ArrayBuffer> {
     const options: any = {
       responseType: 'text',
       headers:this.headers
     };
     return this.http.post(environment.apiURL + 'user/passwordReset/sendEmail', user, options);
+  }
+  public resetPasswordMessage(user : PasswordConfirmation): Observable<ArrayBuffer> {
+    const options: any = {
+      responseType: 'text',
+      headers:this.headers
+    };
+    return this.http.post(environment.apiURL + 'user/passwordReset/sendMessage', user, options);
   }
 
   public resetPassword2(user : PasswordConfirmation): Observable<ArrayBuffer> {
@@ -63,12 +75,19 @@ export class UserService {
     return this.http.post(environment.apiURL + 'user/passwordReset', user, options);
   }
 
-  public register(user : User) : Observable<ArrayBuffer> {
+  public registerWEmail(user : User) : Observable<ArrayBuffer> {
     const options: any = {
       responseType: 'text',
       headers:this.headers
     };
-    return this.http.post(environment.apiURL + 'user/register', user, options);
+    return this.http.post(environment.apiURL + 'user/register/wEmail', user, options);
+  }
+  public registerWMessage(user : User) : Observable<ArrayBuffer> {
+    const options: any = {
+      responseType: 'text',
+      headers:this.headers
+    };
+    return this.http.post(environment.apiURL + 'user/register/wMessage', user, options);
   }
 
   public isLoggedIn(): boolean {

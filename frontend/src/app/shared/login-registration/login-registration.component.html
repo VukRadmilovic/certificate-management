@@ -38,11 +38,10 @@
               </mat-error>
             </mat-form-field>
             <br>
-
-            <mat-radio-group aria-label="Confirmation">
-              <mat-radio-button value="1">E-mail</mat-radio-button>
-              <mat-radio-button value="2">Whatsapp</mat-radio-button>
-            </mat-radio-group>
+              <mat-radio-group aria-label="Confirmation">
+                <mat-radio-button (click)="selectEmail()">E-mail</mat-radio-button>
+                <mat-radio-button (click)="selectTel()">Whatsapp</mat-radio-button>
+              </mat-radio-group>
 
             <br>
             <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="login1()">Login</button>
@@ -112,9 +111,9 @@
                   <input matInput formControlName="confirmation" type="text">
                 </mat-form-field>
                 <br>
-                <mat-radio-group aria-label="Select an option">
-                  <mat-radio-button value="1">E-mail</mat-radio-button>
-                  <mat-radio-button value="2">Whatsapp</mat-radio-button>
+                <mat-radio-group aria-label="Confirmation">
+                  <mat-radio-button (click)="selectEmail()">E-mail</mat-radio-button>
+                  <mat-radio-button (click)="selectTel()">Whatsapp</mat-radio-button>
                 </mat-radio-group>
               </div>
             </div>
@@ -171,8 +170,8 @@
                 </mat-form-field>
                 <br>
                 <mat-radio-group aria-label="Confirmation">
-                  <mat-radio-button value="1">E-mail</mat-radio-button>
-                  <mat-radio-button value="2">Whatsapp</mat-radio-button>
+                  <mat-radio-button (click)="selectEmail()">E-mail</mat-radio-button>
+                  <mat-radio-button (click)="selectTel()">Whatsapp</mat-radio-button>
                 </mat-radio-group>
               </div>
             </div>

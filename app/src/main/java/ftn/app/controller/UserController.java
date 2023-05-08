@@ -98,7 +98,7 @@ public class UserController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = (User) authentication.getPrincipal();
             String jwt = tokenUtils.generateToken(user.getUsername(), (user.getRoles()).get(0));
-            userService.sendConfirmationEmail(user);
+            userService.sendConfirmationMessage(user);
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
         } catch (ExpiredJwtException ex) {
             return new ResponseEntity<>(messageSource.getMessage("jwt.ExpiredToken", null, Locale.getDefault()), HttpStatus.UNAUTHORIZED);
@@ -158,6 +158,18 @@ public class UserController {
             User user = new User();
             user.setEmail(dto.getEmail());
             userService.sendConfirmationEmail(user);
+            return new ResponseEntity<>(messageSource.getMessage("user.passwordReset.emailSent", null, Locale.getDefault()), HttpStatus.OK);
+        } catch (BadCredentialsException ex) {
+            return new ResponseEntity<>(messageSource.getMessage("user.invalidConfirmation", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping(value = "/passwordReset/sendMessage", consumes = "application/json")
+    public ResponseEntity<?> passwordResetSendMessage(@Valid @RequestBody PasswordConfirmationDTO dto) {
+        try {
+            User user = new User();
+            user.setEmail(dto.getEmail());
+            userService.sendConfirmationMessage(user);
             return new ResponseEntity<>(messageSource.getMessage("user.passwordReset.emailSent", null, Locale.getDefault()), HttpStatus.OK);
         } catch (BadCredentialsException ex) {
             return new ResponseEntity<>(messageSource.getMessage("user.invalidConfirmation", null, Locale.getDefault()), HttpStatus.NOT_FOUND);

@@ -15,6 +15,9 @@ import {UserWithConfirmation} from "../model/UserWithConfirmation";
   styleUrls: ['./login-registration.component.css']
 })
 export class LoginRegistrationComponent {
+  emailTel: string;
+  choices: string[] = ["Email", "Whatsapp"]
+
   loginForm = new FormGroup({
     email: new FormControl( '',[Validators.required, Validators.email]),
     password: new FormControl('',[Validators.required]),
@@ -41,6 +44,14 @@ export class LoginRegistrationComponent {
               private router: Router,
               private notificationService: NotificationsService,
               public dialog: MatDialog) {
+    this.emailTel = "Tel"
+  }
+
+  selectEmail(): void{
+    this.emailTel = "Email"
+  }
+  selectTel(): void{
+    this.emailTel = "Tel"
   }
 
   resetPassword(): void{
@@ -50,14 +61,26 @@ export class LoginRegistrationComponent {
         password: <string>this.passwordResetForm.value.confirmPassword,
         confirmation: "1"
       };
-      this.userService.resetPassword(user).subscribe({
-        next: (result) => {
-          this.notificationService.createNotification("Confirm email!");
-        },
-        error: () => {
-          this.notificationService.createNotification("Email is not correct!");
-        },
-      });
+      if(this.emailTel==="Email") {
+        this.userService.resetPasswordEmail(user).subscribe({
+          next: (result) => {
+            this.notificationService.createNotification("Confirm identity!!");
+          },
+          error: () => {
+            this.notificationService.createNotification("Email is not correct!");
+          },
+        });
+      }
+      else{
+        this.userService.resetPasswordMessage(user).subscribe({
+          next: (result) => {
+            this.notificationService.createNotification("Confirm identity!!");
+          },
+          error: () => {
+            this.notificationService.createNotification("Email is not correct!");
+          },
+        });
+      }
     }
   }
 
@@ -98,14 +121,27 @@ export class LoginRegistrationComponent {
         email: <string>this.loginForm.value.email,
         password: <string>this.loginForm.value.password,
       };
-      this.userService.login1(loginVal).subscribe({
-        next: (result) => {
-          this.notificationService.createNotification("Confirm email!");
-        },
-        error: () => {
-          this.notificationService.createNotification("Email or password is not correct!");
-        },
-      });
+
+      if(this.emailTel==="Email"){
+        this.userService.loginEmail(loginVal).subscribe({
+          next: (result) => {
+            this.notificationService.createNotification("Confirm identity!");
+          },
+          error: () => {
+            this.notificationService.createNotification("Email or password is not correct!");
+          },
+        });
+      }
+      else{
+        this.userService.loginMessage(loginVal).subscribe({
+          next: (result) => {
+            this.notificationService.createNotification("Confirm identity!");
+          },
+          error: () => {
+            this.notificationService.createNotification("Email or password is not correct!");
+          },
+        });
+      }
     }
   }
 
@@ -136,21 +172,36 @@ export class LoginRegistrationComponent {
         email: <string>this.registrationForm.value.email,
         password: <string>this.registrationForm.value.password,
       }
-
-
-      this.userService.register(user).subscribe( {
-        next: () => {
-          /*this.notificationService.createNotification("User successfully registered! Confirm user!");
-          this.loginRegisterPassword = 2;
-          this.email = user.email;
-          this.password = user.password;
-          this.openDialog()*/
-          this.notificationService.createNotification("Confirm identity!")
-        },
-        error: (error) => {
-          this.notificationService.createNotification(error.error);
-        }
-      });
+      if(this.emailTel==="Email"){
+        this.userService.registerWEmail(user).subscribe( {
+          next: () => {
+            /*this.notificationService.createNotification("User successfully registered! Confirm user!");
+            this.loginRegisterPassword = 2;
+            this.email = user.email;
+            this.password = user.password;
+            this.openDialog()*/
+            this.notificationService.createNotification("Confirm identity!")
+          },
+          error: (error) => {
+            this.notificationService.createNotification(error.error);
+          }
+        });
+      }
+      else{
+        this.userService.registerWMessage(user).subscribe( {
+          next: () => {
+            /*this.notificationService.createNotification("User successfully registered! Confirm user!");
+            this.loginRegisterPassword = 2;
+            this.email = user.email;
+            this.password = user.password;
+            this.openDialog()*/
+            this.notificationService.createNotification("Confirm identity!")
+          },
+          error: (error) => {
+            this.notificationService.createNotification(error.error);
+          }
+        });
+      }
     }
   }
 
@@ -166,7 +217,7 @@ export class LoginRegistrationComponent {
       }
 
 
-      this.userService.confirm(user).subscribe( {
+      this.userService.register(user).subscribe( {
         next: () => {
           this.notificationService.createNotification("User successfully confirmed!");
         },

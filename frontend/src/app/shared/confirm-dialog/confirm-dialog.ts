@@ -47,7 +47,7 @@ export class ConfirmDialog {
           password: this.data.password,
           confirmation: this.data.confirmation,
         }
-        this.userService.confirm(user).subscribe({
+        this.userService.register(user).subscribe({
           next: () => {
             this.notificationService.createNotification("User successfully confirmed!");
           },
