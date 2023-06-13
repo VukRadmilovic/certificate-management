@@ -45,7 +45,7 @@
 
             <br>
             <div class="flex-row width-40 center-horizontal">
-            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="login1()">Login</button>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" [disabled]="sentCodeLogin" (click)="login1()">Login</button>
             <br>
             <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="login()">Confirm</button>
             </div>
@@ -108,6 +108,7 @@
                   </mat-error>
                 </mat-form-field>
                 <br>
+                <br>
                 <mat-form-field>
                   <mat-label>Confirmation</mat-label>
                   <input matInput formControlName="confirmation" type="text">
@@ -123,7 +124,7 @@
             </mat-radio-group>
             <br>
             <div class="flex-row width-40 center-horizontal">
-            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="register()">Register</button>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" [disabled]="sentCodeRegister" (click)="register()">Register</button>
             <br>
             <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="register2()">Confirm</button>
             </div>
@@ -185,7 +186,7 @@
                 </mat-radio-group>
             <br>
             <div class="flex-row width-40 center-horizontal">
-            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="resetPassword()">Reset</button>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" [disabled]="sentCodeReset" (click)="resetPassword()">Reset</button>
             <br>
             <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="resetPassword2()">Confirm</button>
             </div>

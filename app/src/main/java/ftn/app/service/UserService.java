@@ -6,9 +6,12 @@ import com.twilio.type.PhoneNumber;
 import ftn.app.dto.LoginDTO;
 import ftn.app.model.Confirmation;
 import ftn.app.model.User;
+import ftn.app.model.UserPastPasswords;
 import ftn.app.repository.ConfirmationRepository;
+import ftn.app.repository.PastPasswordsRepository;
 import ftn.app.repository.UserRepository;
 import ftn.app.service.interfaces.IUserService;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +20,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -24,13 +30,20 @@ public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final MailService mailService;
+    private final MessageSource messageSource;
+
+    private final PastPasswordsRepository pastPasswordsRepository;
     private final ConfirmationRepository confirmationRepository;
 
     public UserService(UserRepository userRepository,
                        MailService mailService,
+                       MessageSource messageSource,
+                       PastPasswordsRepository pastPasswordsRepository,
                        ConfirmationRepository confirmationRepository){
         this.userRepository = userRepository;
         this.mailService = mailService;
+        this.messageSource = messageSource;
+        this.pastPasswordsRepository = pastPasswordsRepository;
         this.confirmationRepository = confirmationRepository;
     }
 
@@ -54,6 +67,9 @@ public class UserService implements IUserService {
             throw new ResponseStatusException(HttpStatus.FOUND);
         }
         user.setPassword(passwordEncoder().encode(user.getPassword()));
+        user.setLastPasswordResetDate(new Date());
+        UserPastPasswords pastPassword = new UserPastPasswords(user.getEmail(), user.getPassword());
+        pastPasswordsRepository.save(pastPassword);
         return userRepository.save(user);
     }
 
@@ -90,8 +106,16 @@ public class UserService implements IUserService {
         String password = user.getPassword();
         user = userRepository.findByEmail(user.getEmail()).get();
         if(confirmation(user, confirmation)){
-
+            List<UserPastPasswords> pastPasswords = pastPasswordsRepository.getUserPastPasswordsByEmail(user.getEmail()).get();
+            for(UserPastPasswords pastPassword : pastPasswords) {
+                if(passwordEncoder().matches(password,pastPassword.getPassword())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, messageSource.getMessage("password.hadAlready", null, Locale.getDefault()));
+                }
+            }
             user.setPassword(passwordEncoder().encode(password));
+            user.setLastPasswordResetDate(new Date());
+            UserPastPasswords pastPassword = new UserPastPasswords(user.getEmail(), user.getPassword());
+            pastPasswordsRepository.save(pastPassword);
             userRepository.save(user);
             return true;
         }

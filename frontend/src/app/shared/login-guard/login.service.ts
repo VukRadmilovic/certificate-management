@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {CanActivate, Router, UrlTree} from "@angular/router";
-import {Observable} from "rxjs";
+import {Observable, timer} from "rxjs";
 import {UserService} from "../user.service";
 
 @Injectable({
@@ -16,6 +16,8 @@ export class LoginService implements CanActivate {
     | UrlTree {
     if (this.userService.isLoggedIn()) {
       const role  = this.userService.getRole();
+      //BEST PRACTICE JE 30 MINUTA !! (1800000 milisekundi)
+      timer(60000).subscribe(x => this.userService.forceLogout());
       if(role == 'ROLE_AUTHENTICATED') {
         this.router.navigate(['user-main'])
       }

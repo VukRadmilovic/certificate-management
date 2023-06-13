@@ -17,11 +17,14 @@ import {UserWithConfirmation} from "../model/UserWithConfirmation";
 export class LoginRegistrationComponent {
   emailTel: string;
   choices: string[] = ["Email", "Whatsapp"]
+  sentCodeLogin = false;
+  sentCodeRegister = false;
+  sentCodeReset = false;
 
   loginForm = new FormGroup({
     email: new FormControl( '',[Validators.required, Validators.email]),
     password: new FormControl('',[Validators.required]),
-    confirmation: new FormControl('', [Validators.required]),
+    confirmation: new FormControl('', []),
   });
 
   registrationForm = new FormGroup({
@@ -30,14 +33,14 @@ export class LoginRegistrationComponent {
     name: new FormControl('',[Validators.required]),
     surname: new FormControl('',[Validators.required]),
     phoneNumber: new FormControl('', [Validators.required]),
-    confirmation: new FormControl('', [Validators.required]),
+    confirmation: new FormControl('', []),
   });
 
   passwordResetForm = new FormGroup({
     password: new FormControl('',[Validators.required,Validators.pattern('^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{8,}$')]),
     confirmPassword: new FormControl('',[Validators.required]),
     email: new FormControl( '',[Validators.required, Validators.email]),
-    confirmation: new FormControl('', [Validators.required])
+    confirmation: new FormControl('', [])
   })
 
   constructor(private userService : UserService,
@@ -81,6 +84,7 @@ export class LoginRegistrationComponent {
           },
         });
       }
+      this.sentCodeReset = true;
     }
   }
 
@@ -95,11 +99,17 @@ export class LoginRegistrationComponent {
         next: (result) => {
           this.notificationService.createNotification("Password reset!");
         },
-        error: () => {
-          this.notificationService.createNotification("Email is not correct!");
+        error: (error) => {
+          if(error.error.includes("past")) {
+            this.notificationService.createNotification("The password is the same as one of the previous ones!")
+          }
+          else {
+            this.notificationService.createNotification("Email is not correct!");
+          }
         },
       });
     }
+    this.sentCodeReset = false;
   }
 
   /*openDialog(): void {
@@ -127,8 +137,14 @@ export class LoginRegistrationComponent {
           next: (result) => {
             this.notificationService.createNotification("Confirm identity!");
           },
-          error: () => {
-            this.notificationService.createNotification("Email or password is not correct!");
+          error: (error) => {
+            if(error.status == 200) {
+              this.notificationService.createNotification("Confirm identity!");
+              this.sentCodeLogin = true;
+            }
+            else {
+              this.notificationService.createNotification("Email or password is not correct!");
+            }
           },
         });
       }
@@ -137,8 +153,14 @@ export class LoginRegistrationComponent {
           next: (result) => {
             this.notificationService.createNotification("Confirm identity!");
           },
-          error: () => {
-            this.notificationService.createNotification("Email or password is not correct!");
+          error: (error) => {
+            if(error.error.includes("identity")) {
+              this.notificationService.createNotification("Confirm identity!");
+              this.sentCodeLogin = true;
+            }
+            else {
+              this.notificationService.createNotification("Email or password is not correct!");
+            }
           },
         });
       }
@@ -150,16 +172,23 @@ export class LoginRegistrationComponent {
       const loginVal : LoginCredentials = {
         email: <string>this.loginForm.value.email,
         password: <string>this.loginForm.value.password,
+        confirmation: <string>this.loginForm.value.confirmation
       };
       this.userService.login(loginVal).subscribe({
         next: (result) => {
           sessionStorage.setItem('user', JSON.stringify(result));
           this.router.navigate(['login']);
         },
-        error: () => {
-          this.notificationService.createNotification("Email or password is not correct!");
+        error: (error) => {
+          if(error.error.includes("expired")) {
+            this.notificationService.createNotification("Password expired! Please change your password in the 'Pasword reset tab.'");
+          }
+          else {
+            this.notificationService.createNotification("Email or password is not correct!");
+          }
         },
       });
+      this.sentCodeLogin = false;
     }
   }
 
@@ -171,6 +200,7 @@ export class LoginRegistrationComponent {
         phoneNumber: <string>this.registrationForm.value.phoneNumber,
         email: <string>this.registrationForm.value.email,
         password: <string>this.registrationForm.value.password,
+        confirmation: <string>this.registrationForm.value.confirmation
       }
       if(this.emailTel==="Email"){
         this.userService.registerWEmail(user).subscribe( {
@@ -202,6 +232,7 @@ export class LoginRegistrationComponent {
           }
         });
       }
+      this.sentCodeRegister = true;
     }
   }
 
@@ -225,6 +256,7 @@ export class LoginRegistrationComponent {
           this.notificationService.createNotification(error.error);
         }
       });
+      this.sentCodeRegister = false;
     }
   }
 }

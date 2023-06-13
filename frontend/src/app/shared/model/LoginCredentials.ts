@@ -1,4 +1,5 @@
 export interface LoginCredentials {
   email : string,
-  password: string
+  password: string,
+  confirmation?:string
 }

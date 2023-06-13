@@ -21,8 +21,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 @CrossOrigin("http://localhost:4200")
 @RestController
@@ -54,11 +56,19 @@ public class UserController {
             tempUser.setEmail(loginInfo.getEmail());
             userService.confirmation(tempUser, loginInfo.getConfirmation());
             userService.isConfirmed(loginInfo);
+
+
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginInfo.getEmail(), loginInfo.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = (User) authentication.getPrincipal();
+            long diffInMillies = Math.abs((new Date()).getTime() - user.getLastPasswordResetDate().getTime());
+            long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+            //BEST PRACTICE - 90 DANA TRAJE JEDNA LOZINKA
+            if(diff >= 90) {
+                return new ResponseEntity<>(messageSource.getMessage("password.expired",null, Locale.getDefault()), HttpStatus.BAD_REQUEST);
+            }
             String jwt = tokenUtils.generateToken(user.getUsername(), (user.getRoles()).get(0));
             return new ResponseEntity<>(new TokenDTO(jwt), HttpStatus.OK);
         } catch (ExpiredJwtException ex) {
@@ -79,7 +89,7 @@ public class UserController {
             User user = (User) authentication.getPrincipal();
             tokenUtils.generateToken(user.getUsername(), (user.getRoles()).get(0));
             userService.sendConfirmationEmail(user);
-            return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
+            return new ResponseEntity<>(messageSource.getMessage("user.confirmIdentity", null, Locale.getDefault()), HttpStatus.OK);
         } catch (ExpiredJwtException ex) {
             return new ResponseEntity<>(messageSource.getMessage("jwt.ExpiredToken", null, Locale.getDefault()), HttpStatus.UNAUTHORIZED);
         } catch (BadCredentialsException ex) {
@@ -98,7 +108,7 @@ public class UserController {
             User user = (User) authentication.getPrincipal();
             tokenUtils.generateToken(user.getUsername(), (user.getRoles()).get(0));
             userService.sendConfirmationMessage(user);
-            return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
+            return new ResponseEntity<>(messageSource.getMessage("user.confirmIdentity", null, Locale.getDefault()), HttpStatus.OK);
         } catch (ExpiredJwtException ex) {
             return new ResponseEntity<>(messageSource.getMessage("jwt.ExpiredToken", null, Locale.getDefault()), HttpStatus.UNAUTHORIZED);
         } catch (BadCredentialsException ex) {
@@ -181,10 +191,14 @@ public class UserController {
             User user = new User();
             user.setEmail(dto.getEmail());
             user.setPassword(dto.getPassword());
+            user.setLastPasswordResetDate(new Date());
             userService.passwordConfirmation(user, dto.getConfirmation());
             return new ResponseEntity<>(messageSource.getMessage("user.passwordReset", null, Locale.getDefault()), HttpStatus.OK);
         } catch (BadCredentialsException ex) {
             return new ResponseEntity<>(messageSource.getMessage("user.invalidConfirmation", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
+        }
+        catch(ResponseStatusException ex) {
+            return new ResponseEntity<>(ex.getReason(), ex.getStatus());
         }
     }
 }

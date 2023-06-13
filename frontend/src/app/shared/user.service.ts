@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {LoginCredentials} from "./model/LoginCredentials";
-import {Observable} from "rxjs";
+import {Observable, timer} from "rxjs";
 import {HttpClient, HttpEvent, HttpHeaders} from "@angular/common/http";
 import {Token} from "./model/Token";
 import {environment} from "./environments/environment";
@@ -10,6 +10,7 @@ import {NotificationsService} from "./notifications.service";
 import {User} from "./model/User";
 import {UserWithConfirmation} from "./model/UserWithConfirmation";
 import {PasswordConfirmation} from "./model/PasswordConfirmation";
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,7 @@ export class UserService {
   });
   constructor(private http:HttpClient,
               private snackBar: MatSnackBar,
+              private router : Router,
               private notificationService: NotificationsService) { }
 
   public login(auth: LoginCredentials): Observable<Token> {
@@ -42,6 +44,14 @@ export class UserService {
 
   public logout(): void {
     sessionStorage.removeItem('user');
+  }
+
+  public forceLogout() : void {
+    timer(5000).subscribe(x => {
+      if(sessionStorage.getItem('user') == null) return;
+      this.notificationService.createNotification("Session expired. You will be redirected to the login page.");
+      this.logout();
+      this.router.navigate(['index'])});
   }
 
   public register(user : UserWithConfirmation) : Observable<ArrayBuffer> {
