@@ -1,5 +1,7 @@
 package ftn.app.auth;
 
+import ftn.app.model.enums.EventType;
+import ftn.app.util.LoggingUtil;
 import ftn.app.util.TokenUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +30,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 	public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 
-		String username;
+		String username = "";
 		String authToken = tokenUtils.getToken(request);
 		if (authToken != null) {
 			try {
@@ -44,6 +46,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 			}
 			catch (ExpiredJwtException ex) {
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT token expired! Log in again!");
+				if(username == null) username = "";
+				LoggingUtil.LogEvent(username, EventType.FAIL, "attempted accessing " + request.getRequestURI() + " URL. Request denied due to expired token.");
 				return;
 			}
 		}

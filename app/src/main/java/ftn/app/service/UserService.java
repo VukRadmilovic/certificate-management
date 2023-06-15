@@ -150,14 +150,18 @@ public class UserService implements IUserService {
 
     @Override
     public Boolean isConfirmed(LoginDTO loginInfo) {
-        if(userRepository.findByEmail(loginInfo.getEmail()).get().getIsConfirmed()){
+        Optional<User> user = userRepository.findByEmail(loginInfo.getEmail());
+        if(user.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, messageSource.getMessage("user.notFound", null, Locale.getDefault()));
+        }
+        if(user.get().getIsConfirmed()){
             return true;
         }
         throw new BadCredentialsException("Bad credentials");
     }
     @Override
     public void sendWhatsappMessage(String number, String message){
-        Twilio.init("AC559b6719c0f31fd677511078de1cab33","");
+        Twilio.init("AC559b6719c0f31fd677511078de1cab33","3c3ab560d0b50d6e53a5af12bd176d9d");
         Message.creator(new PhoneNumber("whatsapp:"+number),
                 new PhoneNumber("whatsapp:+14155238886"), message).create();
     }

@@ -1,0 +1,7 @@
+TIMESTAMP	EVENT_TYPE	MESSAGE
+2023-06-15T15:55:32.176012800	REQUEST	: User varga.maja001@gmail.com attempted logging in via email confirmation.
+2023-06-15T15:55:34.373364	SUCCESS	: User varga.maja001@gmail.com request for login processed. Email confirmation sent to varga.maja001@gmail.com email.
+2023-06-15T15:55:46.622960800	REQUEST	: User varga.maja001@gmail.com attempted logging in after two factor confirmation.
+2023-06-15T15:55:46.711405800	SUCCESS	: User varga.maja001@gmail.com request for login succeeded. User is logged in.
+2023-06-15T15:57:34.096943200	REQUEST	: User maya.grudge.12@gmail.com attempted logging in via WhatsApp confirmation.
+2023-06-15T15:57:34.291087100	FAIL	: User maya.grudge.12@gmail.com request for login failed. The user does not exist.
