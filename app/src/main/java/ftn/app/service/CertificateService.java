@@ -7,6 +7,7 @@ import ftn.app.dto.WithdrawingReasonDTO;
 import ftn.app.mapper.CertificateDetailsDTOMapper;
 import ftn.app.model.*;
 import ftn.app.model.enums.CertificateType;
+import ftn.app.model.enums.EventType;
 import ftn.app.model.enums.RequestStatus;
 import ftn.app.repository.CertificateRepository;
 import ftn.app.repository.CertificateRequestRepository;
@@ -14,6 +15,7 @@ import ftn.app.repository.UserRepository;
 import ftn.app.service.interfaces.ICertificateService;
 import ftn.app.util.DateUtil;
 import ftn.app.util.KeystoreUtils;
+import ftn.app.util.LoggingUtil;
 import ftn.app.util.OrganizationDataUtils;
 import ftn.app.util.certificateUtils.CertificateDataUtils;
 import ftn.app.util.certificateUtils.CertificateUtils;
@@ -114,6 +116,7 @@ public class CertificateService implements ICertificateService {
             return isValidCertificate(certificateUtils.getSerialNumber(file));
         } catch (CertificateException | IOException e) {
             e.printStackTrace();
+            LoggingUtil.LogEvent("Internal error.", EventType.ERROR, e.getMessage());
             return false;
         }
     }
@@ -175,9 +178,9 @@ public class CertificateService implements ICertificateService {
         for (CertificateDetailsDTO certificate: certificatesWithoutUserData) {
             Optional<User> userOpt = userRepository.findByEmail(certificate.getOwnerEmail());
             if(userOpt.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("user.doesNotExist", null, Locale.getDefault()));
+                continue;
+                //throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("user.doesNotExist", null, Locale.getDefault()));
             }
-
             User user = userOpt.get();
             certificatesWithUserData.add(new CertificateDetailsWithUserInfoDTO(certificate, user));
         }

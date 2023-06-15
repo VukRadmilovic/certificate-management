@@ -47,9 +47,10 @@ export class UserService {
   }
 
   public forceLogout() : void {
+    if(sessionStorage.getItem('user') == null) return;
+    this.notificationService.createNotification("Session expired. You will be redirected to the login page.");
     timer(5000).subscribe(x => {
       if(sessionStorage.getItem('user') == null) return;
-      this.notificationService.createNotification("Session expired. You will be redirected to the login page.");
       this.logout();
       this.router.navigate(['index'])});
   }

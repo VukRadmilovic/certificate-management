@@ -2,6 +2,8 @@ package ftn.app.util.certificateUtils;
 
 import ftn.app.model.IssuerData;
 import ftn.app.model.SubjectData;
+import ftn.app.model.enums.EventType;
+import ftn.app.util.LoggingUtil;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -48,6 +50,7 @@ public class CertificateUtils {
             return certConverter.getCertificate(certHolder);
 
         } catch (IllegalArgumentException | IllegalStateException | OperatorCreationException | CertificateException e) {
+            LoggingUtil.LogEvent("Internal error.", EventType.ERROR, e.getMessage());
             e.printStackTrace();
         }
         return null;

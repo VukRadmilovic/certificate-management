@@ -21,6 +21,7 @@ public class LoggingUtil {
         LocalDateTime timestamp = LocalDateTime.now();
         String date = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH).format(timestamp);
         if(user.equals("")) user = "Unauthorized user";
+        else if(user.contains("Internal error")) user = user;
         else user = "User " + user;
         String finalUser = user;
         System.out.println(ANSI_BLUE + timestamp + ANSI_RESET + "\t" +

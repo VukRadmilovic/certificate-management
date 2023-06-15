@@ -1,5 +1,6 @@
 package ftn.app.util;
 
+import ftn.app.model.enums.EventType;
 import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
@@ -21,6 +22,7 @@ public class KeystoreUtils {
         try {
             keyStore = KeyStore.getInstance("JKS", "SUN");
         } catch (KeyStoreException | NoSuchProviderException e) {
+            LoggingUtil.LogEvent("Internal error.", EventType.ERROR, e.getMessage());
             e.printStackTrace();
         }
     }
@@ -32,6 +34,7 @@ public class KeystoreUtils {
         try {
             keyStore.load(new FileInputStream(KEYSTORE_PATH), KEYSTORE_PASSWORD);
         } catch (NoSuchAlgorithmException | CertificateException | IOException e) {
+            LoggingUtil.LogEvent("Internal error.", EventType.ERROR, e.getMessage());
             e.printStackTrace();
         }
     }
@@ -48,6 +51,7 @@ public class KeystoreUtils {
             keyStore.store(new FileOutputStream(KEYSTORE_PATH), KEYSTORE_PASSWORD);
 
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
+            LoggingUtil.LogEvent("Internal error.", EventType.ERROR, e.getMessage());
             e.printStackTrace();
         }
     }
@@ -66,8 +70,10 @@ public class KeystoreUtils {
             keyStore.setKeyEntry(alias + "Key", privateKey, password, new Certificate[]{certificate});
             keyStore.store(new FileOutputStream(KEYSTORE_PATH), KEYSTORE_PASSWORD); // Save the modified keystore back to the file
         } catch (KeyStoreException e) {
+            LoggingUtil.LogEvent("Internal error.", EventType.ERROR, e.getMessage());
             e.printStackTrace();
         } catch (CertificateException | IOException | NoSuchAlgorithmException e) {
+            LoggingUtil.LogEvent("Internal error.", EventType.ERROR, e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -84,6 +90,7 @@ public class KeystoreUtils {
                 return keyStore.getCertificate(alias);
             }
         } catch (KeyStoreException e) {
+            LoggingUtil.LogEvent("Internal error.", EventType.ERROR, e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -103,6 +110,7 @@ public class KeystoreUtils {
                 return (PrivateKey) keyStore.getKey(alias, pass.toCharArray());
             }
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
+            LoggingUtil.LogEvent("Internal error.", EventType.ERROR, e.getMessage());
             e.printStackTrace();
         }
         return null;

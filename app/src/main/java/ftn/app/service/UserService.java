@@ -161,7 +161,7 @@ public class UserService implements IUserService {
     }
     @Override
     public void sendWhatsappMessage(String number, String message){
-        Twilio.init("AC559b6719c0f31fd677511078de1cab33","3c3ab560d0b50d6e53a5af12bd176d9d");
+        Twilio.init("AC559b6719c0f31fd677511078de1cab33","");
         Message.creator(new PhoneNumber("whatsapp:"+number),
                 new PhoneNumber("whatsapp:+14155238886"), message).create();
     }

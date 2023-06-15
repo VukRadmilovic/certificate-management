@@ -25,7 +25,7 @@ export class InterceptorService implements HttpInterceptor {
     if (accessToken) {
 
       if (this.jwtHelper.isTokenExpired(accessToken)) {
-        this.notificationService.createNotification("Session expired! Redirecting to login page.");
+        this.notificationService.createNotification("Session expired. You will be redirected to the login page.");
         timer(5000).subscribe(x => { this.router.navigate(['index']) })
       }
       const cloned = req.clone({

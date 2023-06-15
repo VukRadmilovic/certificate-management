@@ -4,8 +4,10 @@ import ftn.app.model.IssuerData;
 import ftn.app.model.OrganizationData;
 import ftn.app.model.SubjectData;
 import ftn.app.model.User;
+import ftn.app.model.enums.EventType;
 import ftn.app.repository.CertificateRepository;
 import ftn.app.util.DateUtil;
+import ftn.app.util.LoggingUtil;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -94,6 +96,7 @@ public class CertificateDataUtils {
             keyGen.initialize(2048, random);
             return keyGen.generateKeyPair();
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+            LoggingUtil.LogEvent("Internal error.", EventType.ERROR, e.getMessage());
             e.printStackTrace();
         }
         return null;
