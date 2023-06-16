@@ -27,7 +27,7 @@ export class UserService {
               private notificationService: NotificationsService) { }
 
   public loginWithGoogle(auth: string): Observable<Token> {
-    return this.http.post<Token>(environment.apiURL + 'oauth', JSON.stringify(auth), {
+    return this.http.post<Token>(environment.apiURL + 'user/loginWithGoogle', JSON.stringify(auth), {
       headers: this.headers,
     });
   }

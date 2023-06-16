@@ -1,5 +1,9 @@
 package ftn.app.controller;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import ftn.app.dto.*;
 import ftn.app.mapper.UserFullDTOMapper;
 import ftn.app.model.Provider;
@@ -11,6 +15,7 @@ import ftn.app.service.UserService;
 import ftn.app.util.LoggingUtil;
 import ftn.app.util.TokenUtils;
 import io.jsonwebtoken.ExpiredJwtException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +25,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -31,10 +37,8 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.management.BadAttributeValueExpException;
 import javax.validation.Valid;
 import java.io.Console;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.BackingStoreException;
 
@@ -100,9 +104,40 @@ public class UserController {
         }
     }
 
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    private String password;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String idClient;
+
     @PostMapping(value = "/loginWithGoogle", consumes = "application/json")
     public ResponseEntity<?> loginWithGoogle(@Valid @RequestBody String credential){
-        return new ResponseEntity<>(credential, HttpStatus.OK);
+        NetHttpTransport transport = new NetHttpTransport();
+        JacksonFactory factory = JacksonFactory.getDefaultInstance();
+        GoogleIdTokenVerifier.Builder ver =
+                new GoogleIdTokenVerifier.Builder(transport,factory)
+                        .setAudience(Collections.singleton(idClient));
+        GoogleIdToken googleIdToken = null;
+        try {
+            googleIdToken = GoogleIdToken.parse(ver.getJsonFactory(),credential);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        GoogleIdToken.Payload payload = googleIdToken.getPayload();
+        String email = payload.getEmail();
+        User user = new User();
+        if(userService.ifEmailExist(email)){
+            user = userService.getUserFromEmail(email);
+        } else {
+            user = new User();
+            user.setEmail(email);
+            user.setProvider(Provider.GOOGLE);
+            user.setPassword(password);
+            userService.register(user);
+        }
+        String jwt = tokenUtils.generateToken(user.getUsername(), (user.getRoles()).get(0));
+        LoggingUtil.LogEvent(user.getEmail(), EventType.SUCCESS,"request for login succeeded. User is logged in");
+        return new ResponseEntity<>(new TokenDTO(jwt), HttpStatus.OK);
     }
 
     @PostMapping(value = "/login/sendEmail", consumes = "application/json")

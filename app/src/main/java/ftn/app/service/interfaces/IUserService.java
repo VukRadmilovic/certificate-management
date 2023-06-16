@@ -20,4 +20,7 @@ public interface IUserService extends UserDetailsService {
     void sendWhatsappMessage(String number, String message);
 
     void processOAuthPostLogin(String email);
+    boolean ifEmailExist(String email);
+
+    User getUserFromEmail(String email);
 }

@@ -72,7 +72,7 @@ public class WebSecurityConfig {
         http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint);
     	http.authorizeRequests()
 				.antMatchers("/api/user/login").permitAll()
-				.antMatchers("/oauth/**").permitAll()
+				.antMatchers("/oauth/token").permitAll()
 				.antMatchers("/api/user/login/sendEmail").permitAll()
 				.antMatchers("/api/user/login/sendMessage").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/user/register/wEmail").permitAll()
@@ -99,7 +99,7 @@ public class WebSecurityConfig {
 
 						userService.processOAuthPostLogin(oauthUser.getEmail());
 
-						response.sendRedirect("/list");
+						response.sendRedirect("/login/sendEmail");
 					}
 				});
        
