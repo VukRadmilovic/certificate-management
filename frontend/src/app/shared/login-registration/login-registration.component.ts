@@ -9,6 +9,7 @@ import {MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog
 import {PasswordConfirmation} from "../model/PasswordConfirmation";
 import {UserWithConfirmation} from "../model/UserWithConfirmation";
 import {ReCaptcha2Component} from "ngx-captcha";
+import {MatTabChangeEvent} from "@angular/material/tabs";
 
 @Component({
   selector: 'app-login-registration',
@@ -16,22 +17,17 @@ import {ReCaptcha2Component} from "ngx-captcha";
   styleUrls: ['./login-registration.component.css']
 })
 export class LoginRegistrationComponent {
+  selectedTabIndex: number = 0;
   emailTel: string;
   choices: string[] = ["Email", "Whatsapp"]
   sentCodeLogin = false;
   sentCodeRegister = false;
   sentCodeReset = false;
+  captchaSecretLogin = ""
+  captchaSecretRegistration = ""
 
-  protected loginForm : FormGroup;
-
-  registrationForm = new FormGroup({
-    email: new FormControl( '',[Validators.required, Validators.email]),
-    password: new FormControl('',[Validators.required,Validators.pattern('^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{8,}$')]),
-    name: new FormControl('',[Validators.required]),
-    surname: new FormControl('',[Validators.required]),
-    phoneNumber: new FormControl('', [Validators.required]),
-    confirmation: new FormControl('', []),
-  });
+  loginForm : FormGroup;
+  registrationForm : FormGroup;
 
   passwordResetForm = new FormGroup({
     password: new FormControl('',[Validators.required,Validators.pattern('^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{8,}$')]),
@@ -55,15 +51,27 @@ export class LoginRegistrationComponent {
               public dialog: MatDialog, private formBuilder: FormBuilder) {
     this.emailTel = "Tel"
     this.loginForm = this.formBuilder.group({
-      recaptcha: ['', Validators.required],
+      recaptchaLogin: ['', Validators.required],
       email: new FormControl( '',[Validators.required, Validators.email]),
       password: new FormControl('',[Validators.required]),
       confirmation: new FormControl('', []),
     });
+    this.registrationForm = this.formBuilder.group({
+      //recaptchaRegistration: ['', Validators.required],
+      email: new FormControl( '',[Validators.required, Validators.email]),
+      password: new FormControl('',[Validators.required,Validators.pattern('^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{8,}$')]),
+      name: new FormControl('',[Validators.required]),
+      surname: new FormControl('',[Validators.required]),
+      phoneNumber: new FormControl('', [Validators.required]),
+      confirmation: new FormControl('', []),
+    });
   }
 
-  handleSuccess({data}: { data: any }) {
-    console.log(data);
+  handleSuccessLogin({data}: { data: any }) {
+    this.captchaSecretLogin = data
+  }
+  handleSuccessRegistration({data}: { data: any }) {
+    this.captchaSecretRegistration = data
   }
 
   selectEmail(): void{
@@ -146,6 +154,7 @@ export class LoginRegistrationComponent {
       const loginVal : LoginCredentials = {
         email: <string>this.loginForm.value.email,
         password: <string>this.loginForm.value.password,
+        captcha: this.captchaSecretLogin,
       };
 
       if(this.emailTel==="Email"){
@@ -188,6 +197,7 @@ export class LoginRegistrationComponent {
       const loginVal : LoginCredentials = {
         email: <string>this.loginForm.value.email,
         password: <string>this.loginForm.value.password,
+        captcha: this.captchaSecretLogin,
         confirmation: <string>this.loginForm.value.confirmation
       };
       this.userService.login(loginVal).subscribe({
@@ -274,5 +284,9 @@ export class LoginRegistrationComponent {
       });
       this.sentCodeRegister = false;
     }
+  }
+
+  onTabChanged($event: MatTabChangeEvent) {
+    console.log(this.selectedTabIndex)
   }
 }

@@ -6,7 +6,7 @@
   <br>
   <br>
   <div class="width-70 center-horizontal border height-90">
-    <mat-tab-group>
+    <mat-tab-group  [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChanged($event);">
       <mat-tab label="Login">
         <div class="padding flex-column">
           <div class="mat-headline-3" style="margin-bottom: 30px;">Login</div>
@@ -44,8 +44,8 @@
               </mat-radio-group>
             <br>
             <div class="flex-row width-40 center-horizontal">
-              <ngx-recaptcha2 #captchaElem siteKey="6LdrNaImAAAAAKe22BLBib5h0QddOkko3hE95YDW" (success)="handleSuccess({data : $event})" [size]="size"
-                              [hl]="lang" [theme]="theme" [type]="type" formControlName="recaptcha">
+              <ngx-recaptcha2 #captchaElem siteKey="6LdrNaImAAAAAKe22BLBib5h0QddOkko3hE95YDW" (success)="handleSuccessLogin({data : $event})" [size]="size"
+                              [hl]="lang" [theme]="theme" [type]="type" formControlName="recaptchaLogin">
               </ngx-recaptcha2>
             </div>
             <br>
@@ -119,7 +119,6 @@
                   <input matInput formControlName="confirmation" type="text">
                 </mat-form-field>
 
-
               </div>
             </div>
             <b><label>Confirmation mode</label></b>
@@ -127,6 +126,13 @@
               <mat-radio-button (click)="selectEmail()">E-mail</mat-radio-button>
               <mat-radio-button (click)="selectTel()">Whatsapp</mat-radio-button>
             </mat-radio-group>
+
+<!--            <br>-->
+<!--            <div class="flex-row width-40 center-horizontal">-->
+<!--              <ngx-recaptcha2 #captchaElem siteKey="6Ld8iKImAAAAAAwM5N5XH3rcE0GUVv-7w2fpxe72" (success)="handleSuccessRegistration({data : $event})" [size]="size"-->
+<!--                              [hl]="lang" [theme]="theme" [type]="type" formControlName="recaptchaRegistration">-->
+<!--              </ngx-recaptcha2>-->
+<!--            </div>-->
             <br>
             <div class="flex-row width-40 center-horizontal">
             <button mat-raised-button color="primary" class="width-exact center-horizontal" [disabled]="sentCodeRegister" (click)="register()">Register</button>

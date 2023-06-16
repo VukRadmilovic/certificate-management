@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ee2a16d1-b73f-45fc-af81-1376f5a3aae7" name="Changes" comment="" />
+    <list default="true" id="ee2a16d1-b73f-45fc-af81-1376f5a3aae7" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/ftn/app/dto/LoginDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/ftn/app/dto/LoginDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/shared/login-registration/login-registration.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/shared/login-registration/login-registration.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/shared/login-registration/login-registration.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/shared/login-registration/login-registration.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/shared/model/LoginCredentials.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/shared/model/LoginCredentials.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -28,7 +33,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Fakultet/V/Bezbednost/info-bezbednost-tim21/frontend",
+    "last_opened_file_path": "C:/Fakultet/V/Bezbednost/info-bezbednost-tim21/app",
     "nodejs_package_manager_path": "npm",
     "ts.external.directory.path": "C:\\Program Files\\JetBrains\\WebStorm 2022.2.3\\plugins\\JavaScriptLanguage\\jsLanguageServicesImpl\\external",
     "vue.rearranger.settings.migration": "true"
@@ -49,6 +54,7 @@
       <workItem from="1683493505535" duration="49000" />
       <workItem from="1683493556112" duration="41000" />
       <workItem from="1683494259959" duration="43000" />
+      <workItem from="1686916060319" duration="23000" />
     </task>
     <servers />
   </component>

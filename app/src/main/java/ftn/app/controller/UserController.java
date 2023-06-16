@@ -5,6 +5,7 @@ import ftn.app.mapper.UserFullDTOMapper;
 import ftn.app.model.Role;
 import ftn.app.model.enums.EventType;
 import ftn.app.repository.RoleRepository;
+import ftn.app.service.CaptchaService;
 import ftn.app.service.UserService;
 import ftn.app.util.LoggingUtil;
 import ftn.app.util.TokenUtils;
@@ -18,17 +19,18 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.management.BadAttributeValueExpException;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.prefs.BackingStoreException;
 
 @CrossOrigin("https://localhost:4200")
 @RestController
@@ -40,23 +42,28 @@ public class UserController {
     private final MessageSource messageSource;
     private final UserService userService;
     private final RoleRepository roleRepository;
+    private final CaptchaService captchaService;
 
     public UserController(AuthenticationManager authenticationManager,
                           TokenUtils tokenUtils,
                           MessageSource messageSource,
                           UserService userService,
-                          RoleRepository roleRepository) {
+                          RoleRepository roleRepository,
+                          CaptchaService captchaService) {
         this.authenticationManager = authenticationManager;
         this.tokenUtils = tokenUtils;
         this.messageSource = messageSource;
         this.userService = userService;
         this.roleRepository = roleRepository;
+        this.captchaService = captchaService;
     }
 
     @PostMapping(value = "/login", consumes = "application/json")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginInfo) {
         LoggingUtil.LogEvent(loginInfo.getEmail(), EventType.REQUEST,"attempted logging in after two factor confirmation");
         try {
+            String response = loginInfo.getCaptcha();
+            captchaService.processResponse(response);
             User tempUser = new User();
             tempUser.setEmail(loginInfo.getEmail());
             userService.confirmation(tempUser, loginInfo.getConfirmation());
@@ -81,6 +88,9 @@ public class UserController {
         } catch (BadCredentialsException ex) {
             LoggingUtil.LogEvent(loginInfo.getEmail(), EventType.FAIL,"request for login failed. The user does not exist");
             return new ResponseEntity<>(messageSource.getMessage("user.notFound", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
+        } catch (BadAttributeValueExpException ex){
+            LoggingUtil.LogEvent(loginInfo.getEmail(), EventType.FAIL,"request for login failed. Captcha error");
+            return new ResponseEntity<>(messageSource.getMessage("captcha.Error", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -88,6 +98,9 @@ public class UserController {
     public ResponseEntity<?> login1(@Valid @RequestBody LoginDTO loginInfo) {
         LoggingUtil.LogEvent(loginInfo.getEmail(), EventType.REQUEST,"attempted logging in via email confirmation");
         try {
+            String response = loginInfo.getCaptcha();
+            captchaService.processResponse(response);
+
             userService.isConfirmed(loginInfo);
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginInfo.getEmail(), loginInfo.getPassword()));
@@ -107,6 +120,9 @@ public class UserController {
         } catch (ResponseStatusException ex) {
             LoggingUtil.LogEvent(loginInfo.getEmail(), EventType.FAIL,"request for login failed. The user does not exist");
             return new ResponseEntity<>(ex.getReason(), ex.getStatus());
+        } catch (BadAttributeValueExpException ex){
+            LoggingUtil.LogEvent(loginInfo.getEmail(), EventType.FAIL,"request for login failed. Captcha error");
+            return new ResponseEntity<>(messageSource.getMessage("captcha.Error", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -114,6 +130,8 @@ public class UserController {
     public ResponseEntity<?> loginWhatsapp(@Valid @RequestBody LoginDTO loginInfo) {
         LoggingUtil.LogEvent(loginInfo.getEmail(), EventType.REQUEST,"attempted logging in via WhatsApp confirmation");
         try {
+            String response = loginInfo.getCaptcha();
+            captchaService.processResponse(response);
             userService.isConfirmed(loginInfo);
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginInfo.getEmail(), loginInfo.getPassword()));
@@ -133,6 +151,9 @@ public class UserController {
         } catch (ResponseStatusException ex) {
             LoggingUtil.LogEvent(loginInfo.getEmail(), EventType.FAIL,"request for login failed. The user does not exist");
             return new ResponseEntity<>(ex.getReason(), ex.getStatus());
+        }catch (BadAttributeValueExpException ex){
+            LoggingUtil.LogEvent(loginInfo.getEmail(), EventType.FAIL,"request for login failed. Captcha error");
+            return new ResponseEntity<>(messageSource.getMessage("captcha.Error", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
         }
     }
 
