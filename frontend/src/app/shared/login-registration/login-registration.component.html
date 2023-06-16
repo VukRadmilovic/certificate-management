@@ -1,4 +1,6 @@
 <body>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<meta name="google-signin-client_id" content="320477895332-g27fngmuckejm21p52728f3vdt4jd6hb.apps.googleusercontent.com">
   <div class = "header">
     <div class= "center-vertical white-text">Certificate issuing app</div>
   </div>
@@ -54,7 +56,15 @@
             <br>
             <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="login()">Confirm</button>
             </div>
+            <br>
+
+              <!--            <button mat-raised-button color="primary" class="width-exact center-horizontal" type="button" (click)="loginWithGoogle(undefined)" class="btn btn-danger">Login with Google</button>-->
+
           </form>
+          <div class="flex-row width-40 center-horizontal" id="buttonDiv">
+          <button mat-raised-button color="primary" class="width-exact center-horizontal">Login with google</button>
+          </div>
+          <br>
         </div>
       </mat-tab>
 

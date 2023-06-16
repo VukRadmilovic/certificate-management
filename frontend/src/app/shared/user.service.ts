@@ -26,6 +26,12 @@ export class UserService {
               private router : Router,
               private notificationService: NotificationsService) { }
 
+  public loginWithGoogle(auth: string): Observable<Token> {
+    return this.http.post<Token>(environment.apiURL + 'user/loginWithGoogle', JSON.stringify(auth), {
+      headers: this.headers,
+    });
+  }
+
   public login(auth: LoginCredentials): Observable<Token> {
     return this.http.post<Token>(environment.apiURL + 'user/login', auth, {
       headers: this.headers,

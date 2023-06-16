@@ -1,4 +1,4 @@
-import {Component, ElementRef, Inject, ViewChild} from '@angular/core';
+import {Component, ElementRef, Inject, NgZone, ViewChild} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {LoginCredentials} from "../model/LoginCredentials";
 import {UserService} from "../user.service";
@@ -8,8 +8,8 @@ import {User} from "../model/User";
 import {MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {PasswordConfirmation} from "../model/PasswordConfirmation";
 import {UserWithConfirmation} from "../model/UserWithConfirmation";
-import {ReCaptcha2Component} from "ngx-captcha";
 import {MatTabChangeEvent} from "@angular/material/tabs";
+import {CredentialResponse, PromptMomentNotification} from "google-one-tap";
 
 @Component({
   selector: 'app-login-registration',
@@ -26,8 +26,8 @@ export class LoginRegistrationComponent {
   captchaSecretLogin = ""
   captchaSecretRegistration = ""
 
-  loginForm : FormGroup;
-  registrationForm : FormGroup;
+  loginForm! : FormGroup;
+  registrationForm! : FormGroup;
 
   passwordResetForm = new FormGroup({
     password: new FormControl('',[Validators.required,Validators.pattern('^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{8,}$')]),
@@ -48,8 +48,31 @@ export class LoginRegistrationComponent {
   constructor(private userService : UserService,
               private router: Router,
               private notificationService: NotificationsService,
-              public dialog: MatDialog, private formBuilder: FormBuilder) {
+              public dialog: MatDialog, private formBuilder: FormBuilder, private _ngZone: NgZone) {
     this.emailTel = "Tel"
+  }
+
+  ngOnInit() {
+    // @ts-ignore
+    window.onGoogleLibraryLoad = () => {
+      // @ts-ignore
+      google.accounts.id.initialize({
+        client_id: '320477895332-g27fngmuckejm21p52728f3vdt4jd6hb.apps.googleusercontent.com',
+        callback: this.loginWithGoogle.bind(this),
+        auto_select: false,
+        cancel_on_tap_outside: true
+      });
+      // @ts-ignore
+      google.accounts.id.renderButton(
+        // @ts-ignore
+        document.getElementById("buttonDiv"),
+        {theme: "outline", size: "large", width: "100%"}
+      );
+      // @ts-ignore
+      google.accounts.id.prompt((notification: PromptMomentNotification) => {
+      });
+    }
+
     this.loginForm = this.formBuilder.group({
       recaptchaLogin: ['', Validators.required],
       email: new FormControl( '',[Validators.required, Validators.email]),
@@ -65,6 +88,14 @@ export class LoginRegistrationComponent {
       phoneNumber: new FormControl('', [Validators.required]),
       confirmation: new FormControl('', []),
     });
+  }
+  async loginWithGoogle(response: CredentialResponse){
+    await this.userService.loginWithGoogle(response.credential).subscribe(
+      (result:any) => {
+        sessionStorage.setItem('user', JSON.stringify(result));
+        this.router.navigate(['login']);
+      }
+    );
   }
 
   handleSuccessLogin({data}: { data: any }) {

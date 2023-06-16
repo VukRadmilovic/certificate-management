@@ -20,11 +20,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.management.BadAttributeValueExpException;
 import javax.validation.Valid;
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -92,6 +95,11 @@ public class UserController {
             LoggingUtil.LogEvent(loginInfo.getEmail(), EventType.FAIL,"request for login failed. Captcha error");
             return new ResponseEntity<>(messageSource.getMessage("captcha.Error", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
         }
+    }
+
+    @PostMapping(value = "/loginWithGoogle", consumes = "application/json")
+    public ResponseEntity<?> loginWithGoogle(@Valid @RequestBody String credential){
+        return new ResponseEntity<>(credential, HttpStatus.OK);
     }
 
     @PostMapping(value = "/login/sendEmail", consumes = "application/json")

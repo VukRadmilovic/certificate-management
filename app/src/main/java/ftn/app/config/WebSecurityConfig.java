@@ -69,8 +69,9 @@ public class WebSecurityConfig {
 				.antMatchers(HttpMethod.POST, "/api/user/passwordReset/sendEmail").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/user/passwordReset/sendMessage").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/user/passwordReset").permitAll()
+				.antMatchers(HttpMethod.POST, "/api/user/loginWithGoogle").permitAll()
 				.anyRequest().authenticated().and()
-				.cors().and()
+				.cors().and().oauth2Login().permitAll().and()
 				.addFilterBefore(new TokenAuthenticationFilter(tokenUtils,  userService), BasicAuthenticationFilter.class);
 		http.csrf().disable();
 		http.headers().frameOptions().disable();
