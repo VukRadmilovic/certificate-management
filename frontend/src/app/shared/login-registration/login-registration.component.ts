@@ -1,5 +1,5 @@
-import { Component, Inject } from '@angular/core';
-import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {Component, ElementRef, Inject, ViewChild} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {LoginCredentials} from "../model/LoginCredentials";
 import {UserService} from "../user.service";
 import {Router} from "@angular/router";
@@ -8,6 +8,7 @@ import {User} from "../model/User";
 import {MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {PasswordConfirmation} from "../model/PasswordConfirmation";
 import {UserWithConfirmation} from "../model/UserWithConfirmation";
+import {ReCaptcha2Component} from "ngx-captcha";
 
 @Component({
   selector: 'app-login-registration',
@@ -21,11 +22,7 @@ export class LoginRegistrationComponent {
   sentCodeRegister = false;
   sentCodeReset = false;
 
-  loginForm = new FormGroup({
-    email: new FormControl( '',[Validators.required, Validators.email]),
-    password: new FormControl('',[Validators.required]),
-    confirmation: new FormControl('', []),
-  });
+  protected loginForm : FormGroup;
 
   registrationForm = new FormGroup({
     email: new FormControl( '',[Validators.required, Validators.email]),
@@ -42,12 +39,31 @@ export class LoginRegistrationComponent {
     email: new FormControl( '',[Validators.required, Validators.email]),
     confirmation: new FormControl('', [])
   })
+  public captchaIsLoaded = false;
+  public captchaSuccess = false;
+  public captchaIsExpired = false;
+  public captchaResponse?: string;
+
+  public theme: 'light' | 'dark' = 'light';
+  public size: 'compact' | 'normal' = 'normal';
+  public lang = 'en';
+  public type: 'image' | 'audio' = 'image';
 
   constructor(private userService : UserService,
               private router: Router,
               private notificationService: NotificationsService,
-              public dialog: MatDialog) {
+              public dialog: MatDialog, private formBuilder: FormBuilder) {
     this.emailTel = "Tel"
+    this.loginForm = this.formBuilder.group({
+      recaptcha: ['', Validators.required],
+      email: new FormControl( '',[Validators.required, Validators.email]),
+      password: new FormControl('',[Validators.required]),
+      confirmation: new FormControl('', []),
+    });
+  }
+
+  handleSuccess({data}: { data: any }) {
+    console.log(data);
   }
 
   selectEmail(): void{

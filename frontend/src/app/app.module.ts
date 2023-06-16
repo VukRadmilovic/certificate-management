@@ -39,6 +39,7 @@ import { CertificatesComponent } from './shared/certificates/certificates.compon
 import {NgxFileDropModule} from "ngx-file-drop";
 import { WithdrawReasonDialogComponent } from './user/withdraw-reason-dialog/withdraw-reason-dialog.component';
 import {MatCheckboxModule} from "@angular/material/checkbox";
+import { NgxCaptchaModule } from 'ngx-captcha';
 
 @NgModule({
   declarations: [
@@ -81,7 +82,8 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
         MatDatepickerModule,
         MatNativeDateModule,
         NgxFileDropModule,
-        MatCheckboxModule
+        MatCheckboxModule,
+        NgxCaptchaModule
     ],
   providers: [    {
     provide: HTTP_INTERCEPTORS,

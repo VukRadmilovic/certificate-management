@@ -42,7 +42,12 @@
                 <mat-radio-button (click)="selectEmail()">E-mail</mat-radio-button>
                 <mat-radio-button (click)="selectTel()">Whatsapp</mat-radio-button>
               </mat-radio-group>
-
+            <br>
+            <div class="flex-row width-40 center-horizontal">
+              <ngx-recaptcha2 #captchaElem siteKey="6LdrNaImAAAAAKe22BLBib5h0QddOkko3hE95YDW" (success)="handleSuccess({data : $event})" [size]="size"
+                              [hl]="lang" [theme]="theme" [type]="type" formControlName="recaptcha">
+              </ngx-recaptcha2>
+            </div>
             <br>
             <div class="flex-row width-40 center-horizontal">
             <button mat-raised-button color="primary" class="width-exact center-horizontal" [disabled]="sentCodeLogin" (click)="login1()">Login</button>
