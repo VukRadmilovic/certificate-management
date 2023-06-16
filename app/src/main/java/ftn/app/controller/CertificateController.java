@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-@CrossOrigin("http://localhost:4200")
+@CrossOrigin("https://localhost:4200")
 @RestController
 @RequestMapping(value = "/api/certificate")
 public class CertificateController {

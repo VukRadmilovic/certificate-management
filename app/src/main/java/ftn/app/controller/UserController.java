@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-@CrossOrigin("http://localhost:4200")
+@CrossOrigin("https://localhost:4200")
 @RestController
 @RequestMapping(value = "/api/user")
 public class UserController {
