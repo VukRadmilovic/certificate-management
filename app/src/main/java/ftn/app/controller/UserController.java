@@ -2,6 +2,7 @@ package ftn.app.controller;
 
 import ftn.app.dto.*;
 import ftn.app.mapper.UserFullDTOMapper;
+import ftn.app.model.Provider;
 import ftn.app.model.Role;
 import ftn.app.model.enums.EventType;
 import ftn.app.repository.RoleRepository;
@@ -20,7 +21,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -174,6 +177,7 @@ public class UserController {
             List<Role> roles = new ArrayList<>();
             roles.add(roleRepository.findByName("ROLE_AUTHENTICATED").get());
             user.setRoles(roles);
+            user.setProvider(Provider.LOCAL);
             user.setIsConfirmed(false);
             userService.register(user);
             userService.sendConfirmationEmail(user);

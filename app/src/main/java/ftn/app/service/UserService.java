@@ -5,6 +5,7 @@ import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 import ftn.app.dto.LoginDTO;
 import ftn.app.model.Confirmation;
+import ftn.app.model.Provider;
 import ftn.app.model.User;
 import ftn.app.model.UserPastPasswords;
 import ftn.app.repository.ConfirmationRepository;
@@ -169,6 +170,19 @@ public class UserService implements IUserService {
         Twilio.init("AC559b6719c0f31fd677511078de1cab33","");
         Message.creator(new PhoneNumber("whatsapp:"+number),
                 new PhoneNumber("whatsapp:+14155238886"), message).create();
+    }
+
+    @Override
+    public void processOAuthPostLogin(String email) {
+        Optional<User> existUser = userRepository.findByEmail(email);
+
+        if (existUser.isEmpty()) {
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setProvider(Provider.GOOGLE);
+
+            userRepository.save(newUser);
+        }
     }
 
 }
