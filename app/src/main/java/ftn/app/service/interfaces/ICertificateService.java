@@ -18,6 +18,6 @@ public interface ICertificateService {
     List<CertificateDetailsDTO> getEligibleCertificatesForIssuing();
     boolean isValidCertificate(String serialNumber);
     Certificate withdraw(User user, String certificateSerialNumber, WithdrawingReasonDTO reason);
-    ByteArrayResource getCertificate(String serialNumber);
+    ByteArrayResource getCertificate(String serialNumber, User requester);
     List<CertificateDetailsWithUserInfoDTO> getAllDetailedCertificates();
 }

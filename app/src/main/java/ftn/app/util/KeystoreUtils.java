@@ -15,7 +15,7 @@ import java.security.cert.CertificateException;
 public class KeystoreUtils {
 
     private KeyStore keyStore;
-    private final String KEYSTORE_PATH = "keystores/keystore.jks";
+    private final String KEYSTORE_PATH = "src/main/resources/keystore/keystore.jks";
     private final char[] KEYSTORE_PASSWORD = "tim21KSSec".toCharArray();
 
     public KeystoreUtils() {
@@ -30,7 +30,7 @@ public class KeystoreUtils {
     /**
      * Omogucava koriscenje postojeceg keystore-a
      */
-    private void loadKeystore() {
+    public void loadKeystore() {
         try {
             keyStore.load(new FileInputStream(KEYSTORE_PATH), KEYSTORE_PASSWORD);
         } catch (NoSuchAlgorithmException | CertificateException | IOException e) {
@@ -85,6 +85,7 @@ public class KeystoreUtils {
      */
     public Certificate readCertificate(String alias) {
         try {
+            loadKeystore();
             alias = alias + "Cert";
             if (keyStore.isCertificateEntry(alias)) {
                 return keyStore.getCertificate(alias);

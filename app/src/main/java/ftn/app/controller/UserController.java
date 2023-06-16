@@ -138,7 +138,7 @@ public class UserController {
 
     @PostMapping(value = "/register/wEmail", consumes = "application/json")
     public ResponseEntity<?> registerWEmail(@Valid @RequestBody UserFullDTO userRegister) {
-        LoggingUtil.LogEvent("User " + userRegister.getEmail(), EventType.REQUEST,"attempted registering via email confirmation");
+        LoggingUtil.LogEvent(userRegister.getEmail(), EventType.REQUEST,"attempted registering via email confirmation");
         try {
             User user = UserFullDTOMapper.fromDTOToUser(userRegister);
 
@@ -148,16 +148,16 @@ public class UserController {
             user.setIsConfirmed(false);
             userService.register(user);
             userService.sendConfirmationEmail(user);
-            LoggingUtil.LogEvent("User "+  userRegister.getEmail(), EventType.SUCCESS,"request for registration processed. Email confirmation sent to " + userRegister.getEmail() + " email address");
+            LoggingUtil.LogEvent(userRegister.getEmail(), EventType.SUCCESS,"request for registration processed. Email confirmation sent to " + userRegister.getEmail() + " email address");
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
         } catch (ResponseStatusException ex) {
-            LoggingUtil.LogEvent("User " + userRegister.getEmail(), EventType.FAIL,"request for registration failed. User with that email already exists");
+            LoggingUtil.LogEvent(userRegister.getEmail(), EventType.FAIL,"request for registration failed. User with that email already exists");
             return new ResponseEntity<>(messageSource.getMessage("user.email.exists", null, Locale.getDefault()), HttpStatus.BAD_REQUEST);
         }
     }
     @PostMapping(value = "/register/wMessage", consumes = "application/json")
     public ResponseEntity<?> registerWMessage(@Valid @RequestBody UserFullDTO userRegister) {
-        LoggingUtil.LogEvent("User " + userRegister.getEmail(), EventType.REQUEST,"attempted registering via WhatsApp confirmation");
+        LoggingUtil.LogEvent(userRegister.getEmail(), EventType.REQUEST,"attempted registering via WhatsApp confirmation");
         try {
             User user = UserFullDTOMapper.fromDTOToUser(userRegister);
 
@@ -167,25 +167,25 @@ public class UserController {
             user.setIsConfirmed(false);
             userService.register(user);
             userService.sendConfirmationMessage(user);
-            LoggingUtil.LogEvent("User " + userRegister.getEmail(), EventType.SUCCESS,"request for registration processed. Message confirmation sent to user's phone number");
+            LoggingUtil.LogEvent(userRegister.getEmail(), EventType.SUCCESS,"request for registration processed. Message confirmation sent to user's phone number");
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
         } catch (ResponseStatusException ex) {
-            LoggingUtil.LogEvent("User " + userRegister.getEmail(), EventType.FAIL,"request for registration failed. User with that email already exists");
+            LoggingUtil.LogEvent(userRegister.getEmail(), EventType.FAIL,"request for registration failed. User with that email already exists");
             return new ResponseEntity<>(messageSource.getMessage("user.email.exists", null, Locale.getDefault()), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping(value = "/register", consumes = "application/json")
     public ResponseEntity<?> registerStep2(@Valid @RequestBody UserFullWithConfirmationDTO userRegister) {
-        LoggingUtil.LogEvent("User " + userRegister.getEmail(), EventType.REQUEST,"attempted registering after two factor confirmation");
+        LoggingUtil.LogEvent(userRegister.getEmail(), EventType.REQUEST,"attempted registering after two factor confirmation");
         try {
             User user = new User();
             user.setEmail(userRegister.getEmail());
             userService.registerConfirmation(user, userRegister.getConfirmation());
-            LoggingUtil.LogEvent("User " + userRegister.getEmail(), EventType.SUCCESS,"request for registration succeeded. User registered");
+            LoggingUtil.LogEvent(userRegister.getEmail(), EventType.SUCCESS,"request for registration succeeded. User registered");
             return new ResponseEntity<>(messageSource.getMessage("user.register", null, Locale.getDefault()), HttpStatus.OK);
         } catch (BadCredentialsException ex) {
-            LoggingUtil.LogEvent("User " + userRegister.getEmail(), EventType.FAIL,"request for registration failed. Invalid confirmation code");
+            LoggingUtil.LogEvent(userRegister.getEmail(), EventType.FAIL,"request for registration failed. Invalid confirmation code");
             return new ResponseEntity<>(messageSource.getMessage("user.invalidConfirmation", null, Locale.getDefault()), HttpStatus.NOT_FOUND);
         }
     }

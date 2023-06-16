@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpResponse} from "@angular/common/http";
 import {CertificateDetailsWithUserInfo} from "./model/CertificateDetailsWithUserInfo";
 import {Observable} from "rxjs";
 import {environment} from "./environments/environment";
@@ -23,7 +23,7 @@ export class CertificateService {
     return this.http.post<boolean>(environment.apiURL + 'certificate/validate', formData);
   }
 
-  public download(id: string) : Observable<Blob> {
-    return this.http.get(environment.apiURL + 'certificate/' + id, {responseType: 'blob'});
+  public download(id: string) : Observable<HttpResponse<Blob>> {
+    return this.http.get<Blob>(environment.apiURL + 'certificate/' + id, {responseType: 'blob' as 'json', observe: 'response'});
   }
 }

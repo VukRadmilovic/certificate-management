@@ -22,15 +22,20 @@ import ftn.app.util.certificateUtils.CertificateUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class CertificateService implements ICertificateService {
@@ -200,7 +205,7 @@ public class CertificateService implements ICertificateService {
     }
 
     @Override
-    public ByteArrayResource getCertificate(String serialNumber) {
+    public ByteArrayResource getCertificate(String serialNumber, User requester) {
         Optional<Certificate> certificateOpt = certificateRepository.findBySerialNumber(serialNumber);
         if (certificateOpt.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, messageSource.getMessage("certificate.doesNotExist", null, Locale.getDefault()));
@@ -214,10 +219,39 @@ public class CertificateService implements ICertificateService {
         String alias = generateAlias(ownerOpt.get(), certificate);
 
         java.security.cert.Certificate fullCertificate = keystoreUtils.readCertificate(alias);
+
+        if (requester.getRoles().get(0).getName().equals("ROLE_ADMIN") || certificate.getOwnerEmail().equals(requester.getEmail())) {
+            PrivateKey privateKey = keystoreUtils.readPrivateKey(alias, alias + "KSSec");
+
+            return createCertificateZip(fullCertificate, privateKey, serialNumber);
+        }
         try {
-            return new ByteArrayResource(fullCertificate.getEncoded());
+            return new ByteArrayResource(fullCertificate.getEncoded(), "crt");
         } catch (CertificateEncodingException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, messageSource.getMessage("certificate.encodingError", null, Locale.getDefault()));
+        }
+    }
+
+    public ByteArrayResource createCertificateZip(java.security.cert.Certificate certificate, PrivateKey privateKey, String serialNumber) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
+
+            ZipEntry certificateEntry = new ZipEntry("certificate" + serialNumber + ".crt");
+            zipOutputStream.putNextEntry(certificateEntry);
+            zipOutputStream.write(certificate.getEncoded());
+
+            ZipEntry privateKeyEntry = new ZipEntry("privateKey" + serialNumber + ".key");
+            zipOutputStream.putNextEntry(privateKeyEntry);
+            zipOutputStream.write(privateKey.getEncoded());
+
+            zipOutputStream.close();
+            outputStream.close();
+
+            byte[] zipBytes = outputStream.toByteArray();
+            return new ByteArrayResource(zipBytes, "zip");
+        } catch (IOException | CertificateEncodingException e) {
+            throw new RuntimeException("Error creating ZIP file: " + e.getMessage(), e);
         }
     }
 

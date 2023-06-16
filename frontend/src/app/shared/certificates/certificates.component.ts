@@ -16,7 +16,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {WithdrawReasonDialogComponent} from "../../user/withdraw-reason-dialog/withdraw-reason-dialog.component";
 import {UserCertificatesService} from "../../user/services/user-certificates.service";
 import {WithdrawalReason} from "../model/WithdrawalReason";
-import {HttpErrorResponse} from "@angular/common/http";
+import {HttpErrorResponse, HttpResponse} from "@angular/common/http";
 import {CertificateType} from "../model/enums/CertificateType";
 
 @Component({
@@ -80,14 +80,15 @@ export class CertificatesComponent implements AfterViewInit {
 
   public download(): void {
     this.certificateService.download(this.selectedCertificate.serialNumber).subscribe(
-      result => {
-        const file = new Blob([result], {type: 'application/octet-stream'});
+      (result: HttpResponse<Blob>) => {
+        const fileType = result.headers.get('content-disposition');
+        const file = new Blob([result.body!], {type: 'application/octet-stream'});
         const fileReader = new FileReader();
-        fileReader.onload = () => {
+        fileReader.onload = (fr) => {
           const url = URL.createObjectURL(file);
           const a = document.createElement('a');
           a.href = url;
-          a.download = 'certificate' + this.selectedCertificate.serialNumber + '.crt';
+          a.download = 'certificate' + this.selectedCertificate.serialNumber + '.' + fileType;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);

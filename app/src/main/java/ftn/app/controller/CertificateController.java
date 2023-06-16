@@ -112,11 +112,20 @@ public class CertificateController {
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         try {
             LoggingUtil.LogEvent(user.getEmail(),EventType.REQUEST,"attempted downloading a certificate");
-            ByteArrayResource resource = certificateService.getCertificate(id);
+            ByteArrayResource resource = certificateService.getCertificate(id, user);
+
+            String type = "crt";
+            if (resource.getDescription().contains("zip")) {
+                type = "zip";
+            }
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentLength(resource.contentLength());
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, type);
+            headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=certificate.crt")
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .contentLength(resource.contentLength())
+                    .headers(headers)
                     .body(resource);
         } catch (ResponseStatusException ex) {
             LoggingUtil.LogEvent(user.getEmail(),EventType.FAIL,"request for downloading certificate failed. " + ex.getReason().substring(0, ex.getReason().length() - 2));
