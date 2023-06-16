@@ -76,12 +76,11 @@ public class UserService implements IUserService {
     @Override
     public Boolean confirmation(User user, String confirmation) {
         user = userRepository.findByEmail(user.getEmail()).get();
-        Optional<Confirmation> existing = confirmationRepository.findByUserAndExpired(user, false);
-        if(existing.isPresent()){
-            if(existing.get().getConfirmation().equals(confirmation)){
-                Confirmation confirmation1 = existing.get();
-                confirmation1.setExpired(true);
-                confirmationRepository.save(confirmation1);
+        List<Confirmation> existing = confirmationRepository.findAllByUserAndExpired(user, false);
+        for (Confirmation c : existing) {
+            if (c.getConfirmation().equals(confirmation)) {
+                c.setExpired(true);
+                confirmationRepository.save(c);
                 return true;
             }
         }
@@ -133,7 +132,13 @@ public class UserService implements IUserService {
         confirmation.setUser(user);
         confirmation.setExpired(false);
         confirmationRepository.save(confirmation);
-        mailService.sendSimpleMessage(user.getEmail(), "Email confirmation", confirmation.getConfirmation());
+        try {
+            mailService.sendSimpleMessage(user.getEmail(), "Email confirmation", confirmation.getConfirmation());
+            //Otkomentarisati za odbranu/test sendgrida. Zakomentarisano jer ima limit od 100 poruka dnevno, pa da ne predjemo limit dok testiramo
+//            mailService.sendTextEmail(user.getEmail(), "Email confirmation", confirmation.getConfirmation());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
