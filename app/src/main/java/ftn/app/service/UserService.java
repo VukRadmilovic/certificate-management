@@ -5,14 +5,18 @@ import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 import ftn.app.dto.LoginDTO;
 import ftn.app.model.Confirmation;
+import ftn.app.model.Provider;
 import ftn.app.model.User;
 import ftn.app.model.UserPastPasswords;
+import ftn.app.model.enums.EventType;
 import ftn.app.repository.ConfirmationRepository;
 import ftn.app.repository.PastPasswordsRepository;
 import ftn.app.repository.UserRepository;
 import ftn.app.service.interfaces.IUserService;
+import ftn.app.util.LoggingUtil;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -60,6 +64,8 @@ public class UserService implements IUserService {
             return user.get();
         }
     }
+
+
 
     @Override
     public User register(User user) {
@@ -169,6 +175,40 @@ public class UserService implements IUserService {
         Twilio.init("AC559b6719c0f31fd677511078de1cab33","");
         Message.creator(new PhoneNumber("whatsapp:"+number),
                 new PhoneNumber("whatsapp:+14155238886"), message).create();
+    }
+
+    @Override
+    public void processOAuthPostLogin(String email) {
+        Optional<User> existUser = userRepository.findByEmail(email);
+
+        if (existUser.isEmpty()) {
+            User user = new User();
+            user.setEmail(email);
+            user.setProvider(Provider.GOOGLE);
+
+            userRepository.save(user);
+            sendConfirmationEmail(user);
+        }
+    }
+
+    @Override
+    public boolean ifEmailExist(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public User getUserFromEmail(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException(String.format("No user found with username '%s'.", email));
+        } else {
+            return user.get();
+        }
     }
 
 }

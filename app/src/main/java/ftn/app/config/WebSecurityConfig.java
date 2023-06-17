@@ -2,7 +2,9 @@ package ftn.app.config;
 
 import ftn.app.auth.RestAuthenticationEntryPoint;
 import ftn.app.auth.TokenAuthenticationFilter;
+import ftn.app.service.CustomOAuth2UserService;
 import ftn.app.service.interfaces.IUserService;
+import ftn.app.util.CustomOAuth2User;
 import ftn.app.util.TokenUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +17,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 
 @Configuration
@@ -28,12 +37,14 @@ public class WebSecurityConfig {
 	private final IUserService userService;
 	private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 	private final TokenUtils tokenUtils;
+	private final CustomOAuth2UserService oAuth2UserService;
 
 	public WebSecurityConfig(IUserService userService, RestAuthenticationEntryPoint restAuthenticationEntryPoint,
-                             TokenUtils tokenUtils){
+                             TokenUtils tokenUtils, CustomOAuth2UserService oAuth2UserService){
 		this.tokenUtils = tokenUtils;
 		this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
 		this.userService = userService;
+		this.oAuth2UserService = oAuth2UserService;
 	}
 
     @Bean
@@ -61,6 +72,7 @@ public class WebSecurityConfig {
         http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint);
     	http.authorizeRequests()
 				.antMatchers("/api/user/login").permitAll()
+				.antMatchers("/oauth/token").permitAll()
 				.antMatchers("/api/user/login/sendEmail").permitAll()
 				.antMatchers("/api/user/login/sendMessage").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/user/register/wEmail").permitAll()
@@ -69,13 +81,27 @@ public class WebSecurityConfig {
 				.antMatchers(HttpMethod.POST, "/api/user/passwordReset/sendEmail").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/user/passwordReset/sendMessage").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/user/passwordReset").permitAll()
+				.antMatchers(HttpMethod.POST, "/api/user/loginWithGoogle").permitAll()
 				.anyRequest().authenticated().and()
-				.cors().and()
+				.cors().and().oauth2Login().permitAll().and()
 				.addFilterBefore(new TokenAuthenticationFilter(tokenUtils,  userService), BasicAuthenticationFilter.class);
 		http.csrf().disable();
 		http.headers().frameOptions().disable();
 
         http.authenticationProvider(authenticationProvider());
+
+		http.oauth2Login().loginPage("/login").userInfoEndpoint().userService(oAuth2UserService)
+				.and().successHandler(new AuthenticationSuccessHandler() {
+					@Override
+					public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+														Authentication authentication) throws IOException, ServletException {
+						CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+
+						userService.processOAuthPostLogin(oauthUser.getEmail());
+
+						response.sendRedirect("/login/sendEmail");
+					}
+				});
        
         return http.build();
     }
