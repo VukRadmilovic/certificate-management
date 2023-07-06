@@ -1,5 +1,6 @@
 package ftn.app;
 
+import ftn.app.util.KeystoreUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -34,5 +35,7 @@ public class Main {
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
+        KeystoreUtils utils = new KeystoreUtils();
+        utils.loadKeystore();
     }
 }

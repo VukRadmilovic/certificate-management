@@ -1,0 +1,216 @@
+<body>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<meta name="google-signin-client_id" content="320477895332-g27fngmuckejm21p52728f3vdt4jd6hb.apps.googleusercontent.com">
+  <div class = "header">
+    <div class= "center-vertical white-text">Certificate issuing app</div>
+  </div>
+  <br>
+  <br>
+  <br>
+  <div class="width-70 center-horizontal border height-90">
+    <mat-tab-group  [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChanged($event);">
+      <mat-tab label="Login">
+        <div class="padding flex-column">
+          <div class="mat-headline-3" style="margin-bottom: 30px;">Login</div>
+          <form [formGroup]="loginForm" class="flex-column center-horizontal width-50">
+            <mat-form-field>
+              <mat-label>Email</mat-label>
+              <input type="email" matInput formControlName="email" placeholder="Ex. pat@example.com">
+              <mat-error *ngIf="loginForm.controls['email'].hasError('email') && !loginForm.controls['email'].hasError('required')">
+                Please enter a valid email address
+              </mat-error>
+              <mat-error *ngIf="loginForm.controls['email'].hasError('required')">
+                Email is <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+              <mat-label>Password</mat-label>
+              <input matInput formControlName="password" type="password">
+              <mat-error *ngIf="loginForm.controls['password'].hasError('required')">
+                Password is <strong>required</strong>
+              </mat-error>
+            </mat-form-field><br>
+            <mat-form-field>
+              <mat-label>Confirmation</mat-label>
+              <input matInput formControlName="confirmation" type="text">
+              <mat-error *ngIf="loginForm.controls['confirmation'].hasError('required')">
+                Confirmation is <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+            <br>
+            <b><label id="example-radio-group-label">Confirmation mode</label></b>
+              <mat-radio-group aria-label="Confirmation">
+                <mat-radio-button (click)="selectEmail()">E-mail</mat-radio-button>
+                <mat-radio-button (click)="selectTel()">Whatsapp</mat-radio-button>
+              </mat-radio-group>
+            <br>
+            <div class="flex-row width-40 center-horizontal">
+              <ngx-recaptcha2 #captchaElem siteKey="6LdrNaImAAAAAKe22BLBib5h0QddOkko3hE95YDW" (success)="handleSuccessLogin({data : $event})" [size]="size"
+                              [hl]="lang" [theme]="theme" [type]="type" formControlName="recaptchaLogin">
+              </ngx-recaptcha2>
+            </div>
+            <br>
+            <div class="flex-row width-40 center-horizontal">
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" [disabled]="sentCodeLogin" (click)="login1()">Login</button>
+            <br>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="login()">Confirm</button>
+            </div>
+            <br>
+          </form>
+          <div class="flex-row width-40 center-horizontal" id="buttonDiv">
+          <button mat-raised-button color="primary" class="width-exact center-horizontal">Login with google</button>
+          </div>
+          <br>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Registration">
+        <div class="padding flex-column">
+          <div class="mat-headline-3" style="margin-bottom: 30px;">Registration</div>
+          <form [formGroup]="registrationForm" class="flex-column center-horizontal width-100">
+            <div class = "flex-row">
+              <div class="width-50 flex-column padding">
+
+                <mat-form-field>
+                  <mat-label>First Name</mat-label>
+                  <input matInput formControlName="name" type="text">
+                  <mat-error *ngIf="registrationForm.controls['name'].hasError('required')">
+                    First Name is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field>
+                  <mat-label>Surname</mat-label>
+                  <input matInput formControlName="surname" type="text">
+                  <mat-error *ngIf="registrationForm.controls['surname'].hasError('required')">
+                    Surname is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field>
+                  <mat-label>Phone number</mat-label>
+                  <input matInput formControlName="phoneNumber" type="tel">
+                  <mat-error *ngIf="registrationForm.controls['phoneNumber'].hasError('required')">
+                    Phone number is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="width-50 flex-column padding vertical-align-top">
+                <mat-form-field>
+                  <mat-label>Email</mat-label>
+                  <input type="email" matInput formControlName="email" placeholder="Ex. pat@example.com">
+                  <mat-error *ngIf="registrationForm.controls['email'].hasError('email') && !registrationForm.controls['email'].hasError('required')">
+                    Please enter a valid email address
+                  </mat-error>
+                  <mat-error *ngIf="registrationForm.controls['email'].hasError('required')">
+                    Email is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+                <br>
+                <mat-form-field>
+                  <mat-label>Password</mat-label>
+                  <input matInput formControlName="password" type="password">
+                  <mat-error *ngIf="registrationForm.controls['password'].hasError('required')">
+                    Password is <strong>required</strong>
+                  </mat-error>
+                  <mat-error *ngIf="!registrationForm.controls['password'].hasError('required') &&
+                                registrationForm.controls['password'].hasError('pattern')">
+                    Password <strong>has to be at least 8 characters long,have no white space characters, have at least one digit, one special character and at least one uppercase letter</strong>
+                  </mat-error>
+                </mat-form-field>
+                <br>
+                <br>
+                <mat-form-field>
+                  <mat-label>Confirmation</mat-label>
+                  <input matInput formControlName="confirmation" type="text">
+                </mat-form-field>
+
+              </div>
+            </div>
+            <b><label>Confirmation mode</label></b>
+            <mat-radio-group aria-label="Confirmation">
+              <mat-radio-button (click)="selectEmail()">E-mail</mat-radio-button>
+              <mat-radio-button (click)="selectTel()">Whatsapp</mat-radio-button>
+            </mat-radio-group>
+
+<!--            <br>-->
+<!--            <div class="flex-row width-40 center-horizontal">-->
+<!--              <ngx-recaptcha2 #captchaElem siteKey="6Ld8iKImAAAAAAwM5N5XH3rcE0GUVv-7w2fpxe72" (success)="handleSuccessRegistration({data : $event})" [size]="size"-->
+<!--                              [hl]="lang" [theme]="theme" [type]="type" formControlName="recaptchaRegistration">-->
+<!--              </ngx-recaptcha2>-->
+<!--            </div>-->
+            <br>
+            <div class="flex-row width-40 center-horizontal">
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" [disabled]="sentCodeRegister" (click)="register()">Register</button>
+            <br>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="register2()">Confirm</button>
+            </div>
+          </form>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Password Reset">
+        <br>
+          <div class="mat-headline-3" style="margin-bottom: 40px;">Password Reset</div>
+          <form [formGroup]="passwordResetForm" class="flex-column center-horizontal width-100">
+              <div class="width-100 flex-row">
+                <div class="flex-column width-50 padding">
+                <mat-form-field>
+                  <mat-label>Password</mat-label>
+                  <input matInput formControlName="password" type="password">
+                  <mat-error *ngIf="passwordResetForm.controls['password'].hasError('required')">
+                    Password is <strong>required</strong>
+                  </mat-error>
+                  <mat-error *ngIf="!passwordResetForm.controls['password'].hasError('required') &&
+                                registrationForm.controls['password'].hasError('pattern')">
+                    Password <strong>has to be at least 8 characters long,have no white space characters, have at least one digit, one special character and at least one uppercase letter</strong>
+                  </mat-error>
+                </mat-form-field>
+                <br>
+                <mat-form-field>
+                  <mat-label>Confirm Password</mat-label>
+                  <input matInput formControlName="confirmPassword" type="password">
+                  <mat-error *ngIf="passwordResetForm.controls['confirmPassword'].hasError('required')">
+                    Field is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+                </div>
+                <div class="flex-column width-50 padding">
+                <mat-form-field>
+                  <mat-label>Email</mat-label>
+                  <input type="email" matInput formControlName="email" placeholder="Ex. pat@example.com">
+                  <mat-error *ngIf="passwordResetForm.controls['email'].hasError('email') && !passwordResetForm.controls['email'].hasError('required')">
+                    Please enter a valid email address
+                  </mat-error>
+                  <mat-error *ngIf="passwordResetForm.controls['email'].hasError('required')">
+                    Email is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>Confirmation</mat-label>
+                  <input type="text" matInput formControlName="confirmation">
+                  <mat-error *ngIf="passwordResetForm.controls['confirmation'].hasError('required')">
+                    Confirmation is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+                </div>
+                </div>
+                <br>
+                <b><label>Confirmation mode</label></b>
+                <mat-radio-group aria-label="Confirmation">
+                  <mat-radio-button (click)="selectEmail()">E-mail</mat-radio-button>
+                  <mat-radio-button (click)="selectTel()">Whatsapp</mat-radio-button>
+                </mat-radio-group>
+            <br>
+            <div class="flex-row width-40 center-horizontal">
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" [disabled]="sentCodeReset" (click)="resetPassword()">Reset</button>
+            <br>
+            <button mat-raised-button color="primary" class="width-exact center-horizontal" (click)="resetPassword2()">Confirm</button>
+            </div>
+            <br>
+          </form>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</body>

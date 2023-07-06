@@ -1,0 +1,19 @@
+<div class="flex-column">
+  <h1 mat-dialog-title class="center-horizontal">Withdrawal Reason</h1>
+  <div mat-dialog-content>
+    <form [formGroup]="reasonForm">
+      <mat-form-field appearance="fill">
+        <mat-label>Reason</mat-label>
+        <textarea matInput formControlName="withdrawalReason"></textarea>
+        <mat-error *ngIf="reasonForm.controls['withdrawalReason'].hasError('required')">
+          Withdrawal reason is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+      <div mat-dialog-actions class="center-horizontal width-100">
+        <button mat-button (click)="close()">Close</button>
+        <button mat-button (click)="submit()" cdkFocusInitial>Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+

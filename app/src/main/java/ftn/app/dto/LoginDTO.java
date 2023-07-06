@@ -15,4 +15,7 @@ public class LoginDTO {
     private String password;
     @NotBlank
     private String email;
+    @NotBlank
+    private String captcha;
+    private String confirmation;
 }

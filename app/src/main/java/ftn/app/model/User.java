@@ -28,6 +28,13 @@ public class User implements UserDetails {
     private String email;
 
     @Column (nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
+
+    @Column(nullable = false)
+    private Boolean isConfirmed;
+
+    @Column (nullable = false)
     private String password;
 
     @Column (nullable = false)
