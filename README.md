@@ -55,7 +55,8 @@ mvn install
 ```
 mvn spring-boot:run
 ```
-The backend server should now be running on http://localhost:8080.
+The backend server should now be running on http://localhost:8080
+
 5. Navigate to the frontend directory
 6. Install frontend dependencies:
 ```
